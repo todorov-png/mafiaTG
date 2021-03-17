@@ -40,10 +40,10 @@ export async function registrationUserInGame(ctx, chatID) {
       );
     }    
     if (users.dataGame.counterDays == 0) {
-      if (users.dataGame.players.length > 24) {
+      if (users.players.length > 24) {
         ctx.reply('Вы опоздали на регистрацию, я уже набрал максимальное количество участников!');
       } else {
-        if (checkUserInBD(users.dataGame.players, ctx.message.from.id)) {
+        if (checkUserInBD(users.players, ctx.message.from.id)) {
           await dq.updateDataRegistrationUserInGame(
             chatID, 
             ctx.message.from.id, 

@@ -19,7 +19,7 @@ export async function updateDataRegistrationUserInGame(chatID, userID, name, use
     await mongobd.Chats.updateOne(
         {chatID: chatID}, 
         {
-          $push: {'dataGame.players':{
+          $push: {'players':{
             userID: userID, 
             name: name, 
             userName: userName}
@@ -73,7 +73,7 @@ export async function getDataCloseWriteChat(chatID) {
     return await mongobd.Chats.findOne(
         { chatID: chatID }, 
         {
-          'dataGame.players': true, 
+          'players': true, 
           'dataGame.statysDay': true,
           'dataGame.counterDays': true,
           _id: false
@@ -113,7 +113,7 @@ export async function updateDataClearDataGame(chatID) {
     await mongobd.Chats.updateOne(
         {chatID: chatID}, 
         {
-        'dataGame.players': [], 
+        'players': [], 
         'dataGame.counterPlayers': 0,
         'dataGame.counterTriada': 0, 
         'dataGame.counterMafia': 0, 
@@ -172,7 +172,7 @@ export async function getDataPlayers(chatID) {
     return await mongobd.Chats.findOne(
         { chatID: chatID }, 
         {
-          'dataGame.players': true, 
+          'players': true, 
           _id: false
         }
     );
@@ -212,7 +212,7 @@ export async function updateDataStartGame(chatID) {
 export async function clearMessageIDPlayers(chatID) {
     await mongobd.Chats.updateOne(
         {chatID: chatID}, 
-        { 'dataGame.players.messageID': 0 }
+        { 'players.messageID': 0 }
     );
 }
 
@@ -220,8 +220,8 @@ export async function clearMessageIDPlayers(chatID) {
     await mongobd.Chats.updateOne(
         {chatID: chatID}, 
         {
-        'dataGame.players.clickMessage': false,
-        'dataGame.players.messageID': 0
+        'players.clickMessage': false,
+        'players.messageID': 0
         }
     );
 } */
@@ -241,9 +241,9 @@ export async function addRolePlayer(chatID, userID, role, allies) {
     await mongobd.Chats.updateOne(
         { chatID: chatID }, 
         {
-            'dataGame.players.$[index].role': role,
-            'dataGame.players.$[index].initialRole': role,
-            'dataGame.players.$[index].allies': allies
+            'players.$[index].role': role,
+            'players.$[index].initialRole': role,
+            'players.$[index].allies': allies
         },
         { arrayFilters : [{ "index.userID" : userID }] }   
     );
@@ -253,7 +253,7 @@ export async function suspendPlayer(chatID, userID) {
     await mongobd.Chats.updateOne(
         { chatID: chatID }, 
         {
-            'dataGame.players.$[index].lifeStatus': false
+            'players.$[index].lifeStatus': false
         },
         { arrayFilters : [{ "index.userID" : userID }] }   
     );
@@ -263,7 +263,7 @@ export async function updateDyingMessage(chatID, userID) {
     await mongobd.Chats.updateOne(
         { chatID: chatID }, 
         {
-            'dataGame.players.$[index].dyingMessage': false
+            'players.$[index].dyingMessage': false
         },
         { arrayFilters : [{ "index.userID" : userID }] }   
     );
@@ -272,7 +272,7 @@ export async function updateDyingMessage(chatID, userID) {
 export async function riseRolePlayer(chatID, role, riseRole) {
     await mongobd.Chats.updateOne(
         { chatID: chatID }, 
-        { 'dataGame.players.$[index].role': riseRole },
+        { 'players.$[index].role': riseRole },
         { arrayFilters : [{ "index.role" : role }] }   
     );
 }
@@ -369,7 +369,7 @@ export async function addTriadaVictoryChat(chatID) {
 export async function updateMessageIDPlayer(chatID, messageID, userID) {
     await mongobd.Chats.updateOne(
         { chatID: chatID }, 
-        { 'dataGame.players.$[index].messageID': messageID },
+        { 'players.$[index].messageID': messageID },
         { arrayFilters : [{ "index.userID" : userID }] }   
     );
 }
@@ -378,7 +378,7 @@ export async function updateCallbackDataPlayer(chatID, actID, userID) {
     await mongobd.Chats.updateOne(
         { chatID: chatID }, 
         {
-            'dataGame.players.$[index].actID': actID
+            'players.$[index].actID': actID
         },
         { arrayFilters : [{ "index.userID" : userID }] }   
     );
@@ -388,7 +388,7 @@ export async function updateCallbackDataVotesAgainstPlayer(chatID, userID, value
     await mongobd.Chats.updateOne(
         { chatID: chatID }, 
         { $inc: {
-                   'dataGame.players.$[index].votesAgainst': value
+                   'players.$[index].votesAgainst': value
                 }
         },
         { arrayFilters : [{ "index.userID" : userID }] }   
@@ -399,7 +399,7 @@ export async function updateCallbackDataVotesForPlayer(chatID, userID, value) {
     await mongobd.Chats.updateOne(
         { chatID: chatID }, 
         { $inc: {
-                   'dataGame.players.$[index].votesFor': value
+                   'players.$[index].votesFor': value
                 }
         },
         { arrayFilters : [{ "index.userID" : userID }] }   
@@ -410,8 +410,8 @@ export async function updateCallbackDataVotesPlayer(chatID, userID, whetherVoted
     await mongobd.Chats.updateOne(
         { chatID: chatID }, 
         {
-            'dataGame.players.$[index].whetherVoted': whetherVoted,
-            'dataGame.players.$[index].votingResult': votingResult
+            'players.$[index].whetherVoted': whetherVoted,
+            'players.$[index].votingResult': votingResult
         },
         { arrayFilters : [{ "index.userID" : userID }] }   
     );
@@ -421,9 +421,9 @@ export async function clearVoticeDay(chatID) {
     await mongobd.Chats.updateOne(
         { chatID: chatID }, 
         {   
-            'dataGame.players.votesAgainst': 0,
-            'dataGame.players.votesFor': 0,
-            'dataGame.players.whetherVoted': false
+            'players.votesAgainst': 0,
+            'players.votesFor': 0,
+            'players.whetherVoted': false
         } 
     );
 }
@@ -432,8 +432,8 @@ export async function updateCallbackDataCop(chatID, act, userID, messageID) {
     await mongobd.Chats.updateOne(
         { chatID: chatID }, 
         {
-            'dataGame.players.$[index].copCheck': act,
-            'dataGame.players.$[index].messageID': messageID
+            'players.$[index].copCheck': act,
+            'players.$[index].messageID': messageID
         },
         { arrayFilters : [{ "index.userID" : userID }] }   
     );
@@ -443,7 +443,7 @@ export async function getInfoPlayer(chatID, userID) {
     return await mongobd.Chats.findOne(
         { chatID: chatID }, 
         {
-            'dataGame.players': { $elemMatch: { userID: { $eq: userID } } },
+            'players': { $elemMatch: { userID: { $eq: userID } } },
             _id: false
         }
     );

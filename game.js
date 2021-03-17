@@ -13,7 +13,7 @@ export async function launch(ChatID) {
     if (data.dataGame.counterPlayers > 3) {
         await app.bot.telegram.sendMessage(ChatID, 'Игра начинается!');
         const masRoles = await creatingRoles(ChatID, data.dataGame.counterPlayers); //Получаем массив ролей
-        await distributionOfRoles(ChatID, masRoles, data.dataGame.players); //Раздаю роли игрокам
+        await distributionOfRoles(ChatID, masRoles, data.players); //Раздаю роли игрокам
         await sendRoleMessage(ChatID); //Отправляем сообщение с ролью и описанием
         let continueGame = true;
         while(continueGame) {
@@ -65,7 +65,7 @@ export async function closeWriteChat(ctx) {
     if (data.dataGame.counterDays != 0) {
         if (data.dataGame.statysDay) {
             let DeleteMessage = true;
-            data.dataGame.players.forEach((item) => {
+            data.players.forEach((item) => {
             if (item.userID == ctx.message.from.id && (item.lifeStatus || item.dyingMessage)) {
                 DeleteMessage = false;
                 if (item.dyingMessage) {
@@ -193,7 +193,7 @@ export async function day(ChatID, data) {
     await sendSunMessage(ChatID, i); //Отправили гифку с наступлением дня
     await sendDayMessageLivePlayers(ChatID, data); //Отправляем сообщение с живыми игроками
     await delay(45000); //Ждем 45 секунд
-    await sendMessageVote(ChatID, data.dataGame.players);//Отправляем голосовалку
+    await sendMessageVote(ChatID, data.players);//Отправляем голосовалку
     await delay(45000);// Ждем 45 секунд 
     await ProcessingResultsDay(ChatID); 
 }
@@ -217,7 +217,7 @@ function sendMessageVote(ChatID, players) {
 
 //Удаляем сообщения если пользователь не выбрал действие
 async function deleteMessageAct(data, ChatID) {
-    data.dataGame.players.forEach((player) => {
+    data.players.forEach((player) => {
         if (player.messageID != 0) {
             app.bot.telegram.deleteMessage(player.userID, player.messageID);
         }
@@ -231,47 +231,47 @@ export async function sendMessageAboutProgressRole(ChatID, userID, actUserID) {
           userAct = await dq.getInfoPlayer(ChatID, actUserID);
     let textMessage = '',
         textMessageUser = '';
-    switch(user.dataGame.players[0].role){
+    switch(user.players[0].role){
         case 'Дон':
             textMessage = '🤵🏻 <b>Мафия</b> выбрала жертву...';
-            textMessageUser = `Ты ушёл стрелять в <a href="tg://user?id=${userAct.dataGame.players[0].userID}">${userAct.dataGame.players[0].name}</a>`;
+            textMessageUser = `Ты ушёл стрелять в <a href="tg://user?id=${userAct.players[0].userID}">${userAct.players[0].name}</a>`;
             break;
         case 'Крёстный отец':
             textMessage = '🤵🏼 <b>Крёстный отец</b> похитил игрока...';
-            textMessageUser = `Ты похитил и заставил молчать <a href="tg://user?id=${userAct.dataGame.players[0].userID}">${userAct.dataGame.players[0].name}</a>`;
+            textMessageUser = `Ты похитил и заставил молчать <a href="tg://user?id=${userAct.players[0].userID}">${userAct.players[0].name}</a>`;
             break;
         case 'Доктор':
             textMessage = '👨🏼‍⚕️ <b>Доктор</b> вышел на ночное дежурство...';
-            textMessageUser = `Ты ушёл лечить <a href="tg://user?id=${userAct.dataGame.players[0].userID}">${userAct.dataGame.players[0].name}</a>`;
+            textMessageUser = `Ты ушёл лечить <a href="tg://user?id=${userAct.players[0].userID}">${userAct.players[0].name}</a>`;
             break;
         case 'Комиссар':
-            if (user.dataGame.players[0].copCheck){
+            if (user.players[0].copCheck){
                 textMessage = '🕵🏼️‍♂️ <b>Комиссар</b> ушёл искать злодеев...';
-                textMessageUser = `Ты ушёл проверять <a href="tg://user?id=${userAct.dataGame.players[0].userID}">${userAct.dataGame.players[0].name}</a>`;
+                textMessageUser = `Ты ушёл проверять <a href="tg://user?id=${userAct.players[0].userID}">${userAct.players[0].name}</a>`;
             } else {
                 textMessage = '🕵🏼️‍♂️ <b>Комиссар</b> зарядил свой пистолет и готов сделать выстрел...';
-                textMessageUser = `Ты ушёл мочить <a href="tg://user?id=${userAct.dataGame.players[0].userID}">${userAct.dataGame.players[0].name}</a>`;
+                textMessageUser = `Ты ушёл мочить <a href="tg://user?id=${userAct.players[0].userID}">${userAct.players[0].name}</a>`;
             }
             break;
         case 'Телохранитель':
             textMessage = '👥 <b>Телохранитель</b> ушёл рисковать жизнью...';
-            textMessageUser = `Ты ушёл защищать <a href="tg://user?id=${userAct.dataGame.players[0].userID}">${userAct.dataGame.players[0].name}</a>`;
+            textMessageUser = `Ты ушёл защищать <a href="tg://user?id=${userAct.players[0].userID}">${userAct.players[0].name}</a>`;
             break;
         case 'Мститель':
             textMessage = '🔪 <b>Мститель</b> ушёл в подворотни...';
-            textMessageUser = `Ты ушёл стрелять в <a href="tg://user?id=${userAct.dataGame.players[0].userID}">${userAct.dataGame.players[0].name}</a>`;
+            textMessageUser = `Ты ушёл стрелять в <a href="tg://user?id=${userAct.players[0].userID}">${userAct.players[0].name}</a>`;
             break;
         case 'Красотка':
             textMessage = '💃🏻 <b>Красотка</b> подарила незабываемую ночь...';
-            textMessageUser = `Ты ушла радовать <a href="tg://user?id=${userAct.dataGame.players[0].userID}">${userAct.dataGame.players[0].name}</a>`;
+            textMessageUser = `Ты ушла радовать <a href="tg://user?id=${userAct.players[0].userID}">${userAct.players[0].name}</a>`;
             break;
         case 'Триада':
             textMessage = '👳🏻‍♂️ <b>Триада</b> сделала свой выстрел...';
-            textMessageUser = `Ты ушёл стрелять в <a href="tg://user?id=${userAct.dataGame.players[0].userID}">${userAct.dataGame.players[0].name}</a>`;
+            textMessageUser = `Ты ушёл стрелять в <a href="tg://user?id=${userAct.players[0].userID}">${userAct.players[0].name}</a>`;
             break;
         case 'Сенсей':
             textMessage = '🧘🏻 <b>Сенсей</b> ушёл проверять...';
-            textMessageUser = `Ты ушёл проверять <a href="tg://user?id=${userAct.dataGame.players[0].userID}">${userAct.dataGame.players[0].name}</a>`;
+            textMessageUser = `Ты ушёл проверять <a href="tg://user?id=${userAct.players[0].userID}">${userAct.players[0].name}</a>`;
             break;
     }
     if (textMessage !== '') {
@@ -294,8 +294,8 @@ export async function sendMessageVoiceUserInChat(ChatID, userID, userIDAct) {
           userAct = await dq.getInfoPlayer(ChatID, userIDAct);
     app.bot.telegram.sendMessage(
         ChatID, 
-        `<a href="tg://user?id=${userID}">${user.dataGame.players[0].name}</a> `+
-        `проголосовал за <a href="tg://user?id=${userIDAct}">${userAct.dataGame.players[0].name}</a>`, 
+        `<a href="tg://user?id=${userID}">${user.players[0].name}</a> `+
+        `проголосовал за <a href="tg://user?id=${userIDAct}">${userAct.players[0].name}</a>`, 
         { parse_mode: 'HTML' }
     );
 }
@@ -351,7 +351,7 @@ async function sendMessageGameEnd(ChatID, won, data) {
     switch (won) {
         case 1:
             textMessage += `и: Мирные жители\n\nПобедители:`;
-            data.dataGame.players.forEach((player) => {
+            data.players.forEach((player) => {
                 if (player.lifeStatus || player.suicide) {
                     textMessage+=`\n  <a href="tg://user?id=${player.userID}">${player.name}</a> - <b>${player.initialRole}</b>`;
                     dq.addWorldVictoryPlayer(ChatID, player.userID);
@@ -364,7 +364,7 @@ async function sendMessageGameEnd(ChatID, won, data) {
             break;
         case 2:
             textMessage += `а: Мафия\n\nПобедители:\n`;
-            data.dataGame.players.forEach((player) => {
+            data.players.forEach((player) => {
                 if (player.lifeStatus && (player.initialRole == 'Дон' || player.initialRole == 'Крёстный отец')) {
                     textMessage+=`\n  <a href="tg://user?id=${player.userID}">${player.name}</a> - <b>${player.initialRole}</b>`;
                     dq.addMafiaVictoryPlayer(ChatID, player.userID);
@@ -380,7 +380,7 @@ async function sendMessageGameEnd(ChatID, won, data) {
             break;
         case 3:
             textMessage += `а: Триада\n\nПобедители:\n`;
-            data.dataGame.players.forEach((player) => {
+            data.players.forEach((player) => {
                 if (player.lifeStatus && (player.initialRole == 'Триада' || player.initialRole == 'Сенсей')) {
                     textMessage+=`\n  <a href="tg://user?id=${player.userID}">${player.name}</a> - <b>${player.initialRole}</b>`;
                     dq.addTriadaVictoryPlayer(ChatID, player.userID);
@@ -432,7 +432,7 @@ async function sendNightMessageLivePlayers(ChatID) {
 async function sendRoleMessage(ChatID) {
     const data = await dq.getDataGame(ChatID);
     let textMessage = 'error';
-    data.dataGame.players.forEach( async (player) => {
+    data.players.forEach( async (player) => {
         switch(player.role) {
             case 'Мирный житель':
                 textMessage = 'Ты - 👨🏼 <b>Мирный житель</b>.\nТвоя задача вычислить Мафию с Триадой и на городском собрании линчевать засранцев';
@@ -484,7 +484,7 @@ async function sendRoleMessage(ChatID) {
 
 //Отправляем сообщение с действиями для активных ролей
 async function sendNightMessageActionsLivePlayers(ChatID, data) {
-    data.dataGame.players.forEach( async (player) => {
+    data.players.forEach( async (player) => {
         if (player.lifeStatus) {
             let textMessage = '';
             switch(player.role) {
@@ -521,7 +521,7 @@ async function sendNightMessageActionsLivePlayers(ChatID, data) {
                 const messageData = await app.bot.telegram.sendMessage(
                     player.userID, 
                     textMessage, 
-                    { reply_markup: keyboards.buttonActionsNight(ChatID, data.dataGame.players, player.userID, player.allies) }
+                    { reply_markup: keyboards.buttonActionsNight(ChatID, data.players, player.userID, player.allies) }
                 );
                 dq.updateMessageIDPlayer(ChatID, messageData.message_id, player.userID);
             }
@@ -536,14 +536,14 @@ async function ProcessingResultsNight(data, ChatID) {
     const cloneData = JSON.parse(JSON.stringify(data));
     //Очищаем действия у того, к кому сходила красотка
     if (data.dataGame.counterPlayers >= 10) {
-        data.dataGame.players.forEach((player, i) => {
+        data.players.forEach((player, i) => {
             if (player.lifeStatus && player.role == 'Красотка' && player.actID != 0) {
                 const actID = player.actID;
-                cloneData.dataGame.players[i].actID = 0;
-                data.dataGame.players.forEach((player, i) => {
+                cloneData.players[i].actID = 0;
+                data.players.forEach((player, i) => {
                     if (player.userID == actID) {
-                        cloneData.dataGame.players[i].actID = 0;
-                        data.dataGame.players[i].actID = 0;
+                        cloneData.players[i].actID = 0;
+                        data.players[i].actID = 0;
                         trigerAction = false;
                         app.bot.telegram.sendMessage(
                             player.userID, 
@@ -554,20 +554,20 @@ async function ProcessingResultsNight(data, ChatID) {
         });
     }
     //Стреляем по игрокам и проверяем их
-    data.dataGame.players.forEach((player, i) => {
+    data.players.forEach((player, i) => {
         if ((player.lifeStatus && player.role == 'Дон' && player.actID != 0)||
             (player.lifeStatus && player.role == 'Комиссар' && player.actID != 0 && !player.copCheck)||
             (player.lifeStatus && player.role == 'Мститель' && player.actID != 0)||
             (player.lifeStatus && player.role == 'Триада' && player.actID != 0)) {
 
             const actID = player.actID;
-            cloneData.dataGame.players[i].actID = 0;
-            data.dataGame.players.forEach((player, i) => {
+            cloneData.players[i].actID = 0;
+            data.players.forEach((player, i) => {
                 if (player.userID == actID) {
-                    cloneData.dataGame.players[i].lifeStatus = false;
-                    cloneData.dataGame.players[i].dyingMessage = true;
-                    cloneData.dataGame.players[i].therapyDay = 0;
-                    data.dataGame.players[i].therapyDay = 0;
+                    cloneData.players[i].lifeStatus = false;
+                    cloneData.players[i].dyingMessage = true;
+                    cloneData.players[i].therapyDay = 0;
+                    data.players[i].therapyDay = 0;
                     trigerAction = false;
                     app.bot.telegram.sendMessage(
                         player.userID, 
@@ -582,12 +582,12 @@ async function ProcessingResultsNight(data, ChatID) {
                   checkingID = player.userID,
                   role = player.role;
 
-            cloneData.dataGame.players[i].actID = 0;
-            data.dataGame.players.forEach((player, i) => {
+            cloneData.players[i].actID = 0;
+            data.players.forEach((player, i) => {
                 if (player.userID == actID) {
                     trigerAction = false;
                     if (role == 'Крёстный отец') {
-                        cloneData.dataGame.players[i].votes = false;
+                        cloneData.players[i].votes = false;
                         app.bot.telegram.sendMessage(
                             player.userID, 
                             'Вы уехали из города и не можете посетить дневное собрание...');
@@ -620,32 +620,32 @@ async function ProcessingResultsNight(data, ChatID) {
         }
     });
     //Оживляем или убиваем игроков
-    data.dataGame.players.forEach((player, i) => {
+    data.players.forEach((player, i) => {
         if (player.lifeStatus && player.role == 'Доктор' && player.actID != 0) {
 
             const actID = player.actID,
                   index = i;
-            cloneData.dataGame.players[i].actID = 0;
+            cloneData.players[i].actID = 0;
 
-            cloneData.dataGame.players.forEach((player, i) => {
+            cloneData.players.forEach((player, i) => {
                 if (player.userID == actID) {
                     if (player.lifeStatus) {
                         if (player.therapyDay == cloneData.dataGame.counterDays -2 ) {
-                            cloneData.dataGame.players[i].lifeStatus = false;
-                            cloneData.dataGame.players[i].dyingMessage = true;
+                            cloneData.players[i].lifeStatus = false;
+                            cloneData.players[i].dyingMessage = true;
                             app.bot.telegram.sendMessage(
                             player.userID, 
                             'Доктор принес еще таблетки и у вас случилась передозировка... '+
                             'Можете сказать "спасибо" доктору в чате с игрой');
                         } else {
-                            cloneData.dataGame.players[i].therapyDay = cloneData.dataGame.counterDays;
+                            cloneData.players[i].therapyDay = cloneData.dataGame.counterDays;
                             app.bot.telegram.sendMessage(
                             player.userID, 
                             'У вас болела голова и доктор дал вам таблетку...');
                         }
                     } else {
-                        cloneData.dataGame.players[i].lifeStatus = true;
-                        cloneData.dataGame.players[i].therapyDay = 0;
+                        cloneData.players[i].lifeStatus = true;
+                        cloneData.players[i].therapyDay = 0;
                         app.bot.telegram.sendMessage(
                             player.userID, 
                             'На вас было совершено покушение, но доктор успел вас спасти...');
@@ -656,26 +656,26 @@ async function ProcessingResultsNight(data, ChatID) {
         }
     });
     //Cпасаем игроков
-    data.dataGame.players.forEach((player, i) => {
+    data.players.forEach((player, i) => {
         if (player.lifeStatus && player.role == 'Телохранитель' && player.actID != 0) {
             const actID = player.actID,
                   index = i;
 
-            cloneData.dataGame.players[i].actID = 0;
-            cloneData.dataGame.players.forEach((player, i) => {
+            cloneData.players[i].actID = 0;
+            cloneData.players.forEach((player, i) => {
                 if (player.userID == actID) {
                     if (player.lifeStatus) {
                         app.bot.telegram.sendMessage(
                             player.userID, 
                             'Телохранитель защищал вас всю ночь, но нападения не произошло...');
                     } else {
-                        cloneData.dataGame.players[index].role = 'Мирный житель';
-                        cloneData.dataGame.players[i].lifeStatus = true;
+                        cloneData.players[index].role = 'Мирный житель';
+                        cloneData.players[i].lifeStatus = true;
                         app.bot.telegram.sendMessage(
                             player.userID, 
                             'На вас было совершено покушение, но телохранитель вас спас и получил ранение...');
                         app.bot.telegram.sendMessage(
-                            cloneData.dataGame.players[index].userID, 
+                            cloneData.players[index].userID, 
                             'Вы спасли жителя, но получили ранение и больше не можете работать телохранителем...');
                     }
                     trigerAction = false;
@@ -690,37 +690,37 @@ async function ProcessingResultsNight(data, ChatID) {
     } else {
         cloneData.dataGame.inactivePlay = 5;
         //Отправляем в чат информацию, если кого-то убили
-        cloneData.dataGame.players.forEach((player, i) => {
-            if (!player.lifeStatus && data.dataGame.players[i].lifeStatus) {
+        cloneData.players.forEach((player, i) => {
+            if (!player.lifeStatus && data.players[i].lifeStatus) {
                 kill = true;
                 app.bot.telegram.sendMessage(
                     ChatID, 
                     `Этой ночью погиб ${player.name} - ${player.role}`);
                 if (player.initialRole == 'Дон') {
-                    cloneData.dataGame.players.forEach((player, i) => {
+                    cloneData.players.forEach((player, i) => {
                         if (player.lifeStatus && player.role == 'Крёстный отец') {
                             app.bot.telegram.sendMessage(
                                 ChatID, 
                                 'Дон убит, теперь вы глава мафии!');
-                            cloneData.dataGame.players[i].role = 'Дон';
+                            cloneData.players[i].role = 'Дон';
                         }
                     });
                 } else if (player.initialRole == 'Комиссар') {
-                    cloneData.dataGame.players.forEach((player, i) => {
+                    cloneData.players.forEach((player, i) => {
                         if (player.lifeStatus && player.role == 'Лейтенант') {
                             app.bot.telegram.sendMessage(
                                 ChatID, 
                                 'Комиссар убит, теперь вы возглавляете участок!');
-                            cloneData.dataGame.players[i].role = 'Комиссар';
+                            cloneData.players[i].role = 'Комиссар';
                         }
                     });
                 } else if (player.initialRole == 'Триада') {
-                    cloneData.dataGame.players.forEach((player, i) => {
+                    cloneData.players.forEach((player, i) => {
                         if (player.lifeStatus && player.role == 'Сенсей') {
                             app.bot.telegram.sendMessage(
                                 ChatID, 
                                 'Триада убита, теперь вы главный!');
-                            cloneData.dataGame.players[i].role = 'Триада';
+                            cloneData.players[i].role = 'Триада';
                         }
                     });
                 }
@@ -738,12 +738,12 @@ async function ProcessingResultsNight(data, ChatID) {
 //Обрабатываем результаты дня
 async function ProcessingResultsDay(ChatID) {
     const data = await dq.getDataGame(ChatID); //Получаю данные голосования
-    let maxVoice = Math.max.apply(null, data.dataGame.players),
+    let maxVoice = Math.max.apply(null, data.players),
         counter = 0,
         userNumber;
 
     await deleteMessageAct(data, ChatID); //Удаляем сообщения на которые пользователь не нажимал
-    data.dataGame.players.forEach((player, i) => {
+    data.players.forEach((player, i) => {
         if (player.lifeStatus && player.votesAgainst == maxVoice) {
             counter += 1;
             userNumber = i;
@@ -753,22 +753,22 @@ async function ProcessingResultsDay(ChatID) {
     if (counter == 1){
         const message = await app.bot.telegram.sendMessage(
             ChatID, 
-            `Вы действительно холите линчевать <a href="tg://user?id=${data.dataGame.players[userNumber].userID}">${data.dataGame.players[userNumber].name}</a>?`,
+            `Вы действительно холите линчевать <a href="tg://user?id=${data.players[userNumber].userID}">${data.players[userNumber].name}</a>?`,
             {
               parse_mode: 'HTML', 
-              reply_markup: keyboards.voteYesNoDay(data.dataGame.players[userNumber].userID, 0, 0)
+              reply_markup: keyboards.voteYesNoDay(data.players[userNumber].userID, 0, 0)
             }
         );
         await delay(30000);
         app.bot.telegram.deleteMessage(ChatID, message.message_id);
         //Отправляем сообщение с кнопками для повешанья в чат и записываем его айди, после таймера удалим его, в базу заносить не нужно
         const newData = await dq.getDataPlayers(ChatID); 
-        if (newData.dataGame.players[userNumber].votesAgainst > newData.dataGame.players[userNumber].votesFor) {
-            dq.suspendPlayer(ChatID, newData.dataGame.players[userNumber].userID); //Вешаем игрока
+        if (newData.players[userNumber].votesAgainst > newData.players[userNumber].votesFor) {
+            dq.suspendPlayer(ChatID, newData.players[userNumber].userID); //Вешаем игрока
             app.bot.telegram.sendMessage(
                 ChatID, 
-                `Сегодня был повешан <a href="tg://user?id=${newData.dataGame.players[userNumber].userID}">`+
-                `${newData.dataGame.players[userNumber].name}</a> - ${newData.dataGame.players[userNumber].role}`,
+                `Сегодня был повешан <a href="tg://user?id=${newData.players[userNumber].userID}">`+
+                `${newData.players[userNumber].name}</a> - ${newData.players[userNumber].role}`,
                 { parse_mode: 'HTML' }
             );
         } else {
@@ -805,7 +805,7 @@ async function sendDayMessageLivePlayers(ChatID, data) {
     let listRoles = '';
     let caunter = 0;
     let masRole = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    data.dataGame.players.forEach((player) => {
+    data.players.forEach((player) => {
         if (player.lifeStatus) {
             caunter++;
             listUsers +=`\n${caunter}) <a href="tg://user?id=${player.userID}">${player.name}</a>`;
@@ -947,7 +947,7 @@ async function getLifeUsersText(chatID) {
     let listUsers = '';
     let caunter = 0;
     const data = await dq.getDataPlayers(chatID);
-    data.dataGame.players.forEach((player) => {
+    data.players.forEach((player) => {
         if (player.lifeStatus) {
             caunter++;
             listUsers +=`\n${caunter}) <a href="tg://user?id=${player.userID}">${player.name}</a>`;
@@ -961,9 +961,9 @@ export async function lastVote(ChatID, result, userID, userIDAct, messageID) {
           userAct = await dq.getInfoPlayer(ChatID, userIDAct);
 
     if (userID != userIDAct) {
-        if (user.dataGame.players[0].lifeStatus && 
-            user.dataGame.players[0].votes && 
-            !user.dataGame.players[0].whetherVoted) {
+        if (user.players[0].lifeStatus && 
+            user.players[0].votes && 
+            !user.players[0].whetherVoted) {
                 if (result) { //За
                     dq.updateCallbackDataVotesAgainstPlayer(ChatID, userIDAct, 1);
                     app.bot.telegram.editMessageReplyMarkup(
@@ -971,12 +971,12 @@ export async function lastVote(ChatID, result, userID, userIDAct, messageID) {
                         messageID,
                         null,
                         keyboards.voteYesNoDay(
-                            userAct.dataGame.players[0].userID, 
-                            userAct.dataGame.players[0].votesAgainst+1, userAct.dataGame.players[0].votesFor
+                            userAct.players[0].userID, 
+                            userAct.players[0].votesAgainst+1, userAct.players[0].votesFor
                             )
                         /* {
                           parse_mode: 'HTML', 
-                          reply_markup: keyboards.voteYesNoDay(userAct.dataGame.players[0].userID, 0, 0)
+                          reply_markup: keyboards.voteYesNoDay(userAct.players[0].userID, 0, 0)
                         } */
                     );
                 } else { //Против
@@ -986,17 +986,17 @@ export async function lastVote(ChatID, result, userID, userIDAct, messageID) {
                         messageID,
                         null,
                         keyboards.voteYesNoDay(
-                            userAct.dataGame.players[0].userID, 
-                            userAct.dataGame.players[0].votesAgainst, userAct.dataGame.players[0].votesFor+1
+                            userAct.players[0].userID, 
+                            userAct.players[0].votesAgainst, userAct.players[0].votesFor+1
                             )
                     );
                 }
                 dq.updateCallbackDataVotesPlayer(ChatID, userID, true, result);
-        } else if (user.dataGame.players[0].lifeStatus && 
-                   user.dataGame.players[0].votes &&
-                   user.dataGame.players[0].whetherVoted) {
+        } else if (user.players[0].lifeStatus && 
+                   user.players[0].votes &&
+                   user.players[0].whetherVoted) {
             //Пользователь уже голосовал
-            if (user.dataGame.players[0].votingResult != result) {
+            if (user.players[0].votingResult != result) {
                 dq.updateCallbackDataVotesPlayer(ChatID, userID, true, result);
                 if (result) {
                     dq.updateCallbackDataVotesAgainstPlayer(ChatID, userIDAct, 1);
@@ -1006,8 +1006,8 @@ export async function lastVote(ChatID, result, userID, userIDAct, messageID) {
                         messageID,
                         null,
                         keyboards.voteYesNoDay(
-                            userAct.dataGame.players[0].userID, 
-                            userAct.dataGame.players[0].votesAgainst+1, userAct.dataGame.players[0].votesFor-1
+                            userAct.players[0].userID, 
+                            userAct.players[0].votesAgainst+1, userAct.players[0].votesFor-1
                             )
                     );
                 } else {
@@ -1018,8 +1018,8 @@ export async function lastVote(ChatID, result, userID, userIDAct, messageID) {
                         messageID,
                         null,
                         keyboards.voteYesNoDay(
-                            userAct.dataGame.players[0].userID, 
-                            userAct.dataGame.players[0].votesAgainst-1, userAct.dataGame.players[0].votesFor+1
+                            userAct.players[0].userID, 
+                            userAct.players[0].votesAgainst-1, userAct.players[0].votesFor+1
                             )
                     );
                 }
@@ -1050,7 +1050,7 @@ export async function callbackQuery(ctx) {
         { 
           reply_markup: keyboards.buttonActionsNight(
             ctx.callbackQuery.data.slice(8), 
-            dataPlayers.dataGame.players, 
+            dataPlayers.players, 
             ctx.callbackQuery.from.id, 1) 
         }
       );
@@ -1064,7 +1064,7 @@ export async function callbackQuery(ctx) {
         { 
           reply_markup: keyboards.buttonActionsNight(
             ctx.callbackQuery.data.slice(7), 
-            dataPlayers.dataGame.players, 
+            dataPlayers.players, 
             ctx.callbackQuery.from.id, 1) 
         }
       );

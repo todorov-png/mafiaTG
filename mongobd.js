@@ -54,32 +54,30 @@ const ChatsSchema = new mongoose.Schema({
         counterDays: { type: Number, required: true, default: 0 },
         statysDay: { type: Boolean, required: true, default: false },
         timeStart: { type: Date, required: true, default: 0 },
-        inactivePlay: { type: Number, required: true, default: 5 },
-        players:[
-            {
-                userID: { type: Number, required: true },
-                name: { type: String, required: true },
-                role: { type: String, required: true },
-                initialRole: { type: String, required: true },
-                allies: { type: Number, required: true, default: 0 },
-                votesAgainst: { type: Number, required: true, default: 0 },
-                votes: { type: Boolean, required: true, default: true },
-
-                votesFor: { type: Number, required: true, default: 0 },
-                whetherVoted: { type: Boolean, required: true, default: false },
-                votingResult: { type: Boolean, required: true, default: true },
-
-                lifeStatus: { type: Boolean, required: true, default: true },
-                suicide: { type: Boolean, required: true, default: false },
-                copCheck: { type: Boolean, required: true, default: true },
-                actID: { type: Number, required: true, default: 0 },
-                therapyDay: { type: Number, required: true, default: 0 },
-                dateOfDeath: { type: Number, required: true, default: 0 },
-                dyingMessage: { type: Boolean, required: true, default: false },
-                messageID: { type: Number, required: true, default: 0 } 
-            }
-        ]
-    }
+        inactivePlay: { type: Number, required: true, default: 5 }
+    },
+    players:[
+        {
+            userID: { type: Number, required: true },
+            name: { type: String, required: true },
+            role: { type: String, required: true },
+            initialRole: { type: String, required: true },
+            allies: { type: Number, required: true, default: 0 },
+            votesAgainst: { type: Number, required: true, default: 0 },
+            votes: { type: Boolean, required: true, default: true },
+            votesFor: { type: Number, required: true, default: 0 },
+            whetherVoted: { type: Boolean, required: true, default: false },
+            votingResult: { type: Boolean, required: true, default: true },
+            lifeStatus: { type: Boolean, required: true, default: true },
+            suicide: { type: Boolean, required: true, default: false },
+            copCheck: { type: Boolean, required: true, default: true },
+            actID: { type: Number, required: true, default: 0 },
+            therapyDay: { type: Number, required: true, default: 0 },
+            dateOfDeath: { type: Number, required: true, default: 0 },
+            dyingMessage: { type: Boolean, required: true, default: false },
+            messageID: { type: Number, required: true, default: 0 } 
+        }
+    ]
 }, { versionKey: false });
 
 

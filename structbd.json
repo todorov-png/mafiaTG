@@ -32,31 +32,29 @@
             "counterDays": 0,
             "statysDay": false,
             "timeStart": 0,
-            "inactivePlay": 5,
-            "players":[
-                {
-                    "userID": 125668,
-                    "name": "Name",
-                    "role": "Мирный",
-                    "initialRole": "Мирный",
-                    "allies": 0,
-                    "votesAgainst": 0,
-
-                    "votesFor": 0,
-                    "whetherVoted": false,
-                    "votingResult": true,
-
-                    "votes": true,
-                    "lifeStatus": true,
-                    "suicide": false,
-                    "copCheck": true,
-                    "actID": 0,
-                    "therapyDay": 0,
-                    "dateOfDeath": 0,
-                    "dyingMessage": false,
-                    "messageID": 0 
-                }
-            ]
-        }
+            "inactivePlay": 5
+        },
+        "players":[
+            {
+                "userID": 125668,
+                "name": "Name",
+                "role": "Мирный",
+                "initialRole": "Мирный",
+                "allies": 0,
+                "votesAgainst": 0,
+                "votesFor": 0,
+                "whetherVoted": false,
+                "votingResult": true,
+                "votes": true,
+                "lifeStatus": true,
+                "suicide": false,
+                "copCheck": true,
+                "actID": 0,
+                "therapyDay": 0,
+                "dateOfDeath": 0,
+                "dyingMessage": false,
+                "messageID": 0 
+            }
+        ]
     }
 }
