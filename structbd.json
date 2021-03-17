@@ -1,0 +1,62 @@
+{
+    "chat":{
+        "chatID": -4654546845,
+        "title": "Mafia",
+        "messageID": 0,
+        "registrationTimeLeft": 90,
+        "statisticsGameInChat": {
+            "gameCounter": 0,
+            "peacefulVictories": 0,
+            "mafiaVictories": 0,
+            "triadaVictories": 0,
+            "knowUsers": 0
+        },
+        "listOfUser":[
+            {
+                "userID": 125668,
+                "name": "Name",
+                "userName": "@usermaane",
+                "gameCounter": 0,
+                "victories": 0,
+                "worldVictories": 0,
+                "mafiaVictories": 0,
+                "triadaVictories": 0,
+                "money": 0
+            }
+        ],
+        "dataGame":{
+            "counterPlayers": 0,
+            "counterTriada": 0,
+            "counterMafia": 0,
+            "counterWorld": 0,
+            "counterDays": 0,
+            "statysDay": false,
+            "timeStart": 0,
+            "inactivePlay": 5,
+            "players":[
+                {
+                    "userID": 125668,
+                    "name": "Name",
+                    "role": "Мирный",
+                    "initialRole": "Мирный",
+                    "allies": 0,
+                    "votesAgainst": 0,
+
+                    "votesFor": 0,
+                    "whetherVoted": false,
+                    "votingResult": true,
+
+                    "votes": true,
+                    "lifeStatus": true,
+                    "suicide": false,
+                    "copCheck": true,
+                    "actID": 0,
+                    "therapyDay": 0,
+                    "dateOfDeath": 0,
+                    "dyingMessage": false,
+                    "messageID": 0 
+                }
+            ]
+        }
+    }
+}
