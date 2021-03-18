@@ -76,7 +76,7 @@ export async function registrationUserInGame(ctx, chatID) {
 export async function checkingLoggedUser(chatID, newChatMembers) {
   const users = await dq.getDataCheckingLoggedUser(chatID);
   if (users != null) {
-    newChatMembers.forEach( async (userChat) => {
+    for (const userChat of newChatMembers) {
       console.log(userChat);
       if (userChat.is_bot == false) { 
         let addTtriger = true;
@@ -89,7 +89,7 @@ export async function checkingLoggedUser(chatID, newChatMembers) {
           await dq.updateDataAddUserInChatBD(chatID, userChat.id, fillingUserName(userChat), userChat.username);
         }
       }
-    });
+    }
   }
 }
 

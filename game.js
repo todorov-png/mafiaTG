@@ -66,14 +66,14 @@ export async function closeWriteChat(ctx) {
     if (data != null && data.dataGame.counterDays != 0) {
         if (data.dataGame.statysDay) {
             let DeleteMessage = true;
-            data.players.forEach( async (item) => {
-            if (item.userID == ctx.message.from.id && (item.lifeStatus || item.dyingMessage)) {
-                DeleteMessage = false;
-                if (item.dyingMessage) {
-                    await dq.updateDyingMessage(ctx.message.chat.id, ctx.message.from.id);
+            for (const item of data.players) {
+                if (item.userID == ctx.message.from.id && (item.lifeStatus || item.dyingMessage)) {
+                    DeleteMessage = false;
+                    if (item.dyingMessage) {
+                        await dq.updateDyingMessage(ctx.message.chat.id, ctx.message.from.id);
+                    }
                 }
             }
-            });
             if (DeleteMessage) {
             ctx.deleteMessage();
             }
@@ -200,8 +200,8 @@ export async function day(ChatID, data) {
 }
 
 //Отправляем сообщение с дневным голосованием
-function sendMessageVote(ChatID, players) {
-    players.forEach(async (player) => {
+async function sendMessageVote(ChatID, players) {
+    for (const player of players) {
         if (player.lifeStatus && player.votes) {
             const messageData = await app.bot.telegram.sendMessage(
                 player.userID, 
@@ -213,16 +213,16 @@ function sendMessageVote(ChatID, players) {
             );
             await dq.updateMessageIDPlayer(ChatID, messageData.message_id, player.userID);
         }
-    });
+    }
 }
 
 //Удаляем сообщения если пользователь не выбрал действие
 async function deleteMessageAct(data, ChatID) {
-    data.players.forEach((player) => {
+    for (const player of data.players) {
         if (player.messageID != 0) {
-            app.bot.telegram.deleteMessage(player.userID, player.messageID);
+            await app.bot.telegram.deleteMessage(player.userID, player.messageID);
         }
-    });
+    }
     await dq.clearMessageIDPlayers(ChatID);
 }
 
@@ -352,7 +352,7 @@ async function sendMessageGameEnd(ChatID, won, data) {
     switch (won) {
         case 1:
             textMessage += `и: Мирные жители\n\nПобедители:`;
-            data.players.forEach( async (player) => {
+            for (const player of data.players) {
                 if (player.lifeStatus || player.suicide) {
                     textMessage+=`\n  <a href="tg://user?id=${player.userID}">${player.name}</a> - <b>${player.initialRole}</b>`;
                     await dq.addWorldVictoryPlayer(ChatID, player.userID);
@@ -360,12 +360,12 @@ async function sendMessageGameEnd(ChatID, won, data) {
                     textEndMessage+=`\n  <a href="tg://user?id=${player.userID}">${player.name}</a> - <b>${player.initialRole}</b>`;
                     await dq.addCounterGamePlayer(ChatID, player.userID);
                 }
-            });
+            }
             await dq.addWorldVictoryChat(ChatID);
             break;
         case 2:
             textMessage += `а: Мафия\n\nПобедители:\n`;
-            data.players.forEach( async (player) => {
+            for (const player of data.players) {
                 if (player.lifeStatus && (player.initialRole == 'Дон' || player.initialRole == 'Крёстный отец')) {
                     textMessage+=`\n  <a href="tg://user?id=${player.userID}">${player.name}</a> - <b>${player.initialRole}</b>`;
                     await dq.addMafiaVictoryPlayer(ChatID, player.userID);
@@ -376,12 +376,12 @@ async function sendMessageGameEnd(ChatID, won, data) {
                     textEndMessage+=`\n  <a href="tg://user?id=${player.userID}">${player.name}</a> - <b>${player.initialRole}</b>`;
                     await dq.addCounterGamePlayer(ChatID, player.userID);
                 }
-            });
+            }
             await dq.addMafiaVictoryChat(ChatID);
             break;
         case 3:
             textMessage += `а: Триада\n\nПобедители:\n`;
-            data.players.forEach( async (player) => {
+            for (const player of data.players) {
                 if (player.lifeStatus && (player.initialRole == 'Триада' || player.initialRole == 'Сенсей')) {
                     textMessage+=`\n  <a href="tg://user?id=${player.userID}">${player.name}</a> - <b>${player.initialRole}</b>`;
                     await dq.addTriadaVictoryPlayer(ChatID, player.userID);
@@ -392,7 +392,7 @@ async function sendMessageGameEnd(ChatID, won, data) {
                     textEndMessage+=`\n  <a href="tg://user?id=${player.userID}">${player.name}</a> - <b>${player.initialRole}</b>`;
                     await dq.addCounterGamePlayer(ChatID, player.userID);
                 }
-            });
+            }
             await dq.addTriadaVictoryChat(ChatID);
             break;
     }
@@ -433,7 +433,7 @@ async function sendNightMessageLivePlayers(ChatID) {
 async function sendRoleMessage(ChatID) {
     const data = await dq.getDataGame(ChatID);
     let textMessage = 'error';
-    data.players.forEach( async (player) => {
+    for (const player of data.players) {
         switch(player.role) {
             case 'Мирный житель':
                 textMessage = 'Ты - 👨🏼 <b>Мирный житель</b>.\nТвоя задача вычислить Мафию с Триадой и на городском собрании линчевать засранцев';
@@ -480,12 +480,12 @@ async function sendRoleMessage(ChatID) {
             textMessage, 
             { parse_mode: 'HTML' }
         );
-    });
+    }
 }
 
 //Отправляем сообщение с действиями для активных ролей
 async function sendNightMessageActionsLivePlayers(ChatID, data) {
-    data.players.forEach( async (player) => {
+    for (const player of data.players) {
         if (player.lifeStatus) {
             let textMessage = '';
             switch(player.role) {
@@ -527,13 +527,13 @@ async function sendNightMessageActionsLivePlayers(ChatID, data) {
                 await dq.updateMessageIDPlayer(ChatID, messageData.message_id, player.userID);
             }
         }
-    });
+    }
 }
 
 //Обрабатываем результаты ночи
 async function ProcessingResultsNight(data, ChatID) {
     let trigerAction = true,
-        kill = false;
+        kill = 0;
     const cloneData = JSON.parse(JSON.stringify(data));
     //Очищаем действия у того, к кому сходила красотка
     if (data.dataGame.counterPlayers >= 10) {
@@ -693,10 +693,24 @@ async function ProcessingResultsNight(data, ChatID) {
         //Отправляем в чат информацию, если кого-то убили
         cloneData.players.forEach((player, i) => {
             if (!player.lifeStatus && data.players[i].lifeStatus) {
-                kill = true;
-                app.bot.telegram.sendMessage(
-                    ChatID, 
-                    `Этой ночью погиб ${player.name} - ${player.role}`);
+                kill += 1;
+                if (player.initialRole == 'Счастливчик'){
+                    if (Math.random() > 0.4){
+                        cloneData.players[i].lifeStatus = true;
+                        kill -= 1;
+                        app.bot.telegram.sendMessage(
+                            ChatID, 
+                            `Этой ночью кому-то из жителей повезло...`);
+                    } else {
+                        app.bot.telegram.sendMessage(
+                            ChatID, 
+                            `Этой ночью погиб ${player.name} - ${player.role}`);
+                    }
+                } else {
+                    app.bot.telegram.sendMessage(
+                        ChatID, 
+                        `Этой ночью погиб ${player.name} - ${player.role}`);
+                }
                 if (player.initialRole == 'Дон') {
                     cloneData.players.forEach((player, i) => {
                         if (player.lifeStatus && player.role == 'Крёстный отец') {
@@ -728,7 +742,7 @@ async function ProcessingResultsNight(data, ChatID) {
             }
         });
         await dq.updateDataGame(ChatID, cloneData.dataGame, cloneData.players); //Перезаписываем данные игры
-        if (!kill) {
+        if (kill > 0) {
             app.bot.telegram.sendMessage(
                 ChatID, 
                 'Хм, этой ночью никто не умер...');
