@@ -8,6 +8,7 @@ export async function getDataRegistrationUserInGame(chatID) {
         {
         title: true, 
         dataGame: true, 
+        players: true, 
         'statisticsGameInChat.knowUsers': true, 
         listOfUser: true,
         _id: false
@@ -114,6 +115,7 @@ export async function updateDataClearDataGame(chatID) {
         {chatID: chatID}, 
         {
         'players': [], 
+        'messageID': 0,
         'dataGame.counterPlayers': 0,
         'dataGame.counterTriada': 0, 
         'dataGame.counterMafia': 0, 
@@ -136,10 +138,13 @@ export async function updateDataInactivePlay(chatID) {
     );
 }
 
-export async function updateDataGame(chatID, dataGame) {
+export async function updateDataGame(chatID, dataGame, players) {
     await mongobd.Chats.updateOne(
         {chatID: chatID}, 
-        {'dataGame': dataGame}
+        {
+            'dataGame': dataGame,
+            'players': players 
+        }
     );
 }
 
@@ -182,7 +187,8 @@ export async function getDataGame(chatID) {
     return await mongobd.Chats.findOne(
         { chatID: chatID }, 
         {
-          'dataGame': true, 
+          'dataGame': true,
+          'players': true, 
           _id: false
         }
     );

@@ -24,10 +24,19 @@ export async function checkBotAdmin(ChatID) {
   return status;
 }
 
+export async function checkStartGame(ChatID) {
+  let check = false;
+  const data = await dq.getDataDeleteMessageRegistration(ChatID);
+  if (data.messageID == 0){
+    check = true;
+  } 
+  return check;
+}
 
 //Записываем пользователя на игру и сохраняем его в чате
 export async function registrationUserInGame(ctx, chatID) {
   const users = await dq.getDataRegistrationUserInGame(chatID);
+  console.log(users);
   if (users == null) {
     ctx.reply('Чат игры не найден, попробуйте еще', Extra.inReplyTo(ctx.message.message_id));
   } else {
@@ -67,7 +76,7 @@ export async function registrationUserInGame(ctx, chatID) {
 export async function checkingLoggedUser(chatID, newChatMembers) {
   const users = await dq.getDataCheckingLoggedUser(chatID);
   if (users != null) {
-    newChatMembers.forEach((userChat) => {
+    newChatMembers.forEach( async (userChat) => {
       console.log(userChat);
       if (userChat.is_bot == false) { 
         let addTtriger = true;
@@ -77,7 +86,7 @@ export async function checkingLoggedUser(chatID, newChatMembers) {
           }
         });
         if (addTtriger) {
-          dq.updateDataAddUserInChatBD(chatID, userChat.id, fillingUserName(userChat), userChat.username);
+          await dq.updateDataAddUserInChatBD(chatID, userChat.id, fillingUserName(userChat), userChat.username);
         }
       }
     });

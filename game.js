@@ -62,14 +62,15 @@ export async function clearDataGame(chatID) {
 //Закрытие чата для всех кто не живой
 export async function closeWriteChat(ctx) {
     const data = await dq.getDataCloseWriteChat(ctx.message.chat.id);
-    if (data.dataGame.counterDays != 0) {
+
+    if (data != null && data.dataGame.counterDays != 0) {
         if (data.dataGame.statysDay) {
             let DeleteMessage = true;
-            data.players.forEach((item) => {
+            data.players.forEach( async (item) => {
             if (item.userID == ctx.message.from.id && (item.lifeStatus || item.dyingMessage)) {
                 DeleteMessage = false;
                 if (item.dyingMessage) {
-                    dq.updateDyingMessage(ctx.message.chat.id, ctx.message.from.id);
+                    await dq.updateDyingMessage(ctx.message.chat.id, ctx.message.from.id);
                 }
             }
             });
@@ -210,7 +211,7 @@ function sendMessageVote(ChatID, players) {
                     reply_markup: keyboards.buttonActionsDay(ChatID, players, player.userID) 
                 }
             );
-            dq.updateMessageIDPlayer(ChatID, messageData.message_id, player.userID);
+            await dq.updateMessageIDPlayer(ChatID, messageData.message_id, player.userID);
         }
     });
 }
@@ -351,48 +352,48 @@ async function sendMessageGameEnd(ChatID, won, data) {
     switch (won) {
         case 1:
             textMessage += `и: Мирные жители\n\nПобедители:`;
-            data.players.forEach((player) => {
+            data.players.forEach( async (player) => {
                 if (player.lifeStatus || player.suicide) {
                     textMessage+=`\n  <a href="tg://user?id=${player.userID}">${player.name}</a> - <b>${player.initialRole}</b>`;
-                    dq.addWorldVictoryPlayer(ChatID, player.userID);
+                    await dq.addWorldVictoryPlayer(ChatID, player.userID);
                 } else {
                     textEndMessage+=`\n  <a href="tg://user?id=${player.userID}">${player.name}</a> - <b>${player.initialRole}</b>`;
-                    dq.addCounterGamePlayer(ChatID, player.userID);
+                    await dq.addCounterGamePlayer(ChatID, player.userID);
                 }
             });
-            dq.addWorldVictoryChat(ChatID);
+            await dq.addWorldVictoryChat(ChatID);
             break;
         case 2:
             textMessage += `а: Мафия\n\nПобедители:\n`;
-            data.players.forEach((player) => {
+            data.players.forEach( async (player) => {
                 if (player.lifeStatus && (player.initialRole == 'Дон' || player.initialRole == 'Крёстный отец')) {
                     textMessage+=`\n  <a href="tg://user?id=${player.userID}">${player.name}</a> - <b>${player.initialRole}</b>`;
-                    dq.addMafiaVictoryPlayer(ChatID, player.userID);
+                    await dq.addMafiaVictoryPlayer(ChatID, player.userID);
                 } else if (player.suicide) {
                     textMessage+=`\n  <a href="tg://user?id=${player.userID}">${player.name}</a> - <b>${player.initialRole}</b>`;
-                    dq.addWorldVictoryPlayer(ChatID, player.userID);
+                    await dq.addWorldVictoryPlayer(ChatID, player.userID);
                 } else {
                     textEndMessage+=`\n  <a href="tg://user?id=${player.userID}">${player.name}</a> - <b>${player.initialRole}</b>`;
-                    dq.addCounterGamePlayer(ChatID, player.userID);
+                    await dq.addCounterGamePlayer(ChatID, player.userID);
                 }
             });
-            dq.addMafiaVictoryChat(ChatID);
+            await dq.addMafiaVictoryChat(ChatID);
             break;
         case 3:
             textMessage += `а: Триада\n\nПобедители:\n`;
-            data.players.forEach((player) => {
+            data.players.forEach( async (player) => {
                 if (player.lifeStatus && (player.initialRole == 'Триада' || player.initialRole == 'Сенсей')) {
                     textMessage+=`\n  <a href="tg://user?id=${player.userID}">${player.name}</a> - <b>${player.initialRole}</b>`;
-                    dq.addTriadaVictoryPlayer(ChatID, player.userID);
+                    await dq.addTriadaVictoryPlayer(ChatID, player.userID);
                 } else if (player.suicide) {
                     textMessage+=`\n  <a href="tg://user?id=${player.userID}">${player.name}</a> - <b>${player.initialRole}</b>`;
-                    dq.addWorldVictoryPlayer(ChatID, player.userID);
+                    await dq.addWorldVictoryPlayer(ChatID, player.userID);
                 } else {
                     textEndMessage+=`\n  <a href="tg://user?id=${player.userID}">${player.name}</a> - <b>${player.initialRole}</b>`;
-                    dq.addCounterGamePlayer(ChatID, player.userID);
+                    await dq.addCounterGamePlayer(ChatID, player.userID);
                 }
             });
-            dq.addTriadaVictoryChat(ChatID);
+            await dq.addTriadaVictoryChat(ChatID);
             break;
     }
     textMessage+=`\n\nОстальные участники:`+textEndMessage+`\n\nИгра длилась: `+convertTimeToText(data.dataGame.timeStart);
@@ -505,7 +506,7 @@ async function sendNightMessageActionsLivePlayers(ChatID, data) {
                         'Что будем делать?', 
                         { reply_markup: keyboards.checkOrKill(ChatID) }
                     );
-                    dq.updateMessageIDPlayer(ChatID, messageData.message_id, player.userID);
+                    await dq.updateMessageIDPlayer(ChatID, messageData.message_id, player.userID);
                     break;
                 case 'Телохранитель':
                     textMessage = 'Кого будем защищать этой ночью?';
@@ -523,7 +524,7 @@ async function sendNightMessageActionsLivePlayers(ChatID, data) {
                     textMessage, 
                     { reply_markup: keyboards.buttonActionsNight(ChatID, data.players, player.userID, player.allies) }
                 );
-                dq.updateMessageIDPlayer(ChatID, messageData.message_id, player.userID);
+                await dq.updateMessageIDPlayer(ChatID, messageData.message_id, player.userID);
             }
         }
     });
@@ -726,7 +727,7 @@ async function ProcessingResultsNight(data, ChatID) {
                 }
             }
         });
-        await dq.updateDataGame(ChatID, cloneData.dataGame); //Перезаписываем данные игры
+        await dq.updateDataGame(ChatID, cloneData.dataGame, cloneData.players); //Перезаписываем данные игры
         if (!kill) {
             app.bot.telegram.sendMessage(
                 ChatID, 
@@ -749,7 +750,7 @@ async function ProcessingResultsDay(ChatID) {
             userNumber = i;
         }
     });
-    dq.clearVoticeDay(ChatID);
+    await dq.clearVoticeDay(ChatID);
     if (counter == 1){
         const message = await app.bot.telegram.sendMessage(
             ChatID, 
@@ -764,7 +765,7 @@ async function ProcessingResultsDay(ChatID) {
         //Отправляем сообщение с кнопками для повешанья в чат и записываем его айди, после таймера удалим его, в базу заносить не нужно
         const newData = await dq.getDataPlayers(ChatID); 
         if (newData.players[userNumber].votesAgainst > newData.players[userNumber].votesFor) {
-            dq.suspendPlayer(ChatID, newData.players[userNumber].userID); //Вешаем игрока
+            await dq.suspendPlayer(ChatID, newData.players[userNumber].userID); //Вешаем игрока
             app.bot.telegram.sendMessage(
                 ChatID, 
                 `Сегодня был повешан <a href="tg://user?id=${newData.players[userNumber].userID}">`+
@@ -777,7 +778,7 @@ async function ProcessingResultsDay(ChatID) {
                 `Мнения жителей разошлись, этой ночью никого не вешаем...`
             );
         }
-        dq.clearVoticeDay(ChatID);
+        await dq.clearVoticeDay(ChatID);
     } else {
         app.bot.telegram.sendMessage(
             ChatID, 
@@ -944,9 +945,10 @@ async function deleteMessageRegistration(chatID) {
 
 //Получаем список живых игроков
 async function getLifeUsersText(chatID) {
-    let listUsers = '';
-    let caunter = 0;
+    let listUsers = '',
+        caunter = 0;
     const data = await dq.getDataPlayers(chatID);
+
     data.players.forEach((player) => {
         if (player.lifeStatus) {
             caunter++;
@@ -965,7 +967,7 @@ export async function lastVote(ChatID, result, userID, userIDAct, messageID) {
             user.players[0].votes && 
             !user.players[0].whetherVoted) {
                 if (result) { //За
-                    dq.updateCallbackDataVotesAgainstPlayer(ChatID, userIDAct, 1);
+                    await dq.updateCallbackDataVotesAgainstPlayer(ChatID, userIDAct, 1);
                     app.bot.telegram.editMessageReplyMarkup(
                         ChatID, 
                         messageID,
@@ -980,7 +982,7 @@ export async function lastVote(ChatID, result, userID, userIDAct, messageID) {
                         } */
                     );
                 } else { //Против
-                    dq.updateCallbackDataVotesForPlayer(ChatID, userIDAct, 1);
+                    await dq.updateCallbackDataVotesForPlayer(ChatID, userIDAct, 1);
                     app.bot.telegram.editMessageReplyMarkup(
                         ChatID, 
                         messageID,
@@ -991,16 +993,16 @@ export async function lastVote(ChatID, result, userID, userIDAct, messageID) {
                             )
                     );
                 }
-                dq.updateCallbackDataVotesPlayer(ChatID, userID, true, result);
+                await dq.updateCallbackDataVotesPlayer(ChatID, userID, true, result);
         } else if (user.players[0].lifeStatus && 
                    user.players[0].votes &&
                    user.players[0].whetherVoted) {
             //Пользователь уже голосовал
             if (user.players[0].votingResult != result) {
-                dq.updateCallbackDataVotesPlayer(ChatID, userID, true, result);
+                await dq.updateCallbackDataVotesPlayer(ChatID, userID, true, result);
                 if (result) {
-                    dq.updateCallbackDataVotesAgainstPlayer(ChatID, userIDAct, 1);
-                    dq.updateCallbackDataVotesForPlayer(ChatID, userIDAct, -1);
+                    await dq.updateCallbackDataVotesAgainstPlayer(ChatID, userIDAct, 1);
+                    await dq.updateCallbackDataVotesForPlayer(ChatID, userIDAct, -1);
                     app.bot.telegram.editMessageReplyMarkup(
                         ChatID, 
                         messageID,
@@ -1011,8 +1013,8 @@ export async function lastVote(ChatID, result, userID, userIDAct, messageID) {
                             )
                     );
                 } else {
-                    dq.updateCallbackDataVotesAgainstPlayer(ChatID, userIDAct, -1);
-                    dq.updateCallbackDataVotesForPlayer(ChatID, userIDAct, 1);
+                    await dq.updateCallbackDataVotesAgainstPlayer(ChatID, userIDAct, -1);
+                    await dq.updateCallbackDataVotesForPlayer(ChatID, userIDAct, 1);
                     app.bot.telegram.editMessageReplyMarkup(
                         ChatID, 
                         messageID,
@@ -1035,12 +1037,12 @@ export async function callbackQuery(ctx) {
       ctx.deleteMessage();
       const messageData = ctx.callbackQuery.data.split(' ');
       sendMessageAboutProgressRole(messageData[1], ctx.callbackQuery.from.id, messageData[2]);
-      dq.updateCallbackDataPlayer(messageData[1], messageData[2], ctx.callbackQuery.from.id);
+      await dq.updateCallbackDataPlayer(messageData[1], messageData[2], ctx.callbackQuery.from.id);
     } else if (ctx.callbackQuery.data.slice(0, 2) == 'vs') {
       ctx.deleteMessage();
       const messageData = ctx.callbackQuery.data.split(' ');
       sendMessageVoiceUserInChat(messageData[1], ctx.callbackQuery.from.id, messageData[2]);
-      dq.updateCallbackDataVotesAgainstPlayer(messageData[1], messageData[2], 1);
+      await dq.updateCallbackDataVotesAgainstPlayer(messageData[1], messageData[2], 1);
     } else if (ctx.callbackQuery.data.slice(0, 8) == 'copcheck') {
       ctx.deleteMessage();
       const dataPlayers = await dq.getDataPlayers(ctx.callbackQuery.data.slice(8));
@@ -1054,7 +1056,7 @@ export async function callbackQuery(ctx) {
             ctx.callbackQuery.from.id, 1) 
         }
       );
-      dq.updateCallbackDataCop(ctx.callbackQuery.data.slice(8), true, ctx.callbackQuery.from.id, message.message_id);
+      await dq.updateCallbackDataCop(ctx.callbackQuery.data.slice(8), true, ctx.callbackQuery.from.id, message.message_id);
     } else if (ctx.callbackQuery.data.slice(0, 7) == 'copkill') {
       ctx.deleteMessage();
       const dataPlayers = await dq.getDataPlayers(ctx.callbackQuery.data.slice(7));
@@ -1068,7 +1070,7 @@ export async function callbackQuery(ctx) {
             ctx.callbackQuery.from.id, 1) 
         }
       );
-      dq.updateCallbackDataCop(ctx.callbackQuery.data.slice(7), false, ctx.callbackQuery.from.id, message.message_id);
+      await dq.updateCallbackDataCop(ctx.callbackQuery.data.slice(7), false, ctx.callbackQuery.from.id, message.message_id);
     } else if (ctx.callbackQuery.data == 'newgame') {
       ctx.deleteMessage();
       if (functions.checkBotAdmin(ctx.callbackQuery.message.chat.id)) {

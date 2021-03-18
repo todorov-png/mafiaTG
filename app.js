@@ -26,7 +26,7 @@ bot.catch((err, ctx) => {
 
 //Приветствуем пользователя и записываем его на игру, если с командой пришел id чата
 bot.start( (ctx) => {
-  if (ctx.message.text.length === 6) {
+  if (ctx.message.text.length == 6) {
     ctx.reply('Привет, для запуска игры отправь команду /game в групповом чате');
   } else {
     //Сохраняем в бд пользователя и записываем его на игру
@@ -49,9 +49,10 @@ bot.command('game', (ctx) => {
   //Если пришло с группового чата, то запускаем регистрацию участников
   if (functions.checkTypeChat(ctx.message.chat.type)) {
     //Проверяем дали ли боту права админа
-    if (functions.checkBotAdmin(ctx.message.chat.id)) {
-      functions.updateOrAddChatInBD(ctx.message.chat.id, ctx.message.chat.title);
-      game.launch(ctx.message.chat.id);
+    if (functions.checkBotAdmin(ctx.message.chat.id) &&
+        functions.checkStartGame(ctx.message.chat.id)) {
+          functions.updateOrAddChatInBD(ctx.message.chat.id, ctx.message.chat.title);
+          game.launch(ctx.message.chat.id);
     }
   } else {
     ctx.reply('Эту команду необходимо отправлять в групповом чате!');
