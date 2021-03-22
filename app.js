@@ -116,7 +116,8 @@ bot.on('new_chat_title', (ctx) => {
 
 //Ловим колбеки от кнопок
 bot.on('callback_query', async (ctx) => {
-  console.log('callbake ', ctx.callbackQuery);
+  console.log('callbake ');
+  console.log(ctx.callbackQuery);
   game.callbackQuery(ctx);
   
 });
@@ -130,110 +131,5 @@ bot.on('text', (ctx) => {
 });
 
 
-
-
-
-
-
 //Запускаем бесконечный цикл полинга
 bot.launch();
-
-
-
-
-/* bot.help((ctx) => ctx.reply('Send me a sticker'));
-bot.command('oldschool', (ctx) => {
-    console.log(ctx);
-});
-bot.on('sticker', (ctx) => ctx.reply('👍'));
-bot.hears('hi', (ctx) => ctx.reply('Hey there'));
-
-
-bot.command('oldschool', (ctx) => {
-    console.log(ctx.message.chat.type);
-});
-
-bot.command('game', async (ctx) => {
-    if (ctx.message.chat.type == 'group' || ctx.message.chat.type == 'supergroup') {
-      await ctx.replyWithHTML('Игра начнётся через 90 секунд! \nСписок участников:', keyboards.yesNoKeyboard());
-    }
-    //https://t.me/todorovevbot?start=5324115
-});
-
-bot.on('new_chat_members', (ctx) => {
-    console.log(ctx.message.chat.type);
-});
-
-bot.on('callback_query', (ctx) => {
-    console.log(ctx.message.chat);
-}); */
-
-/* bot.start((ctx) => ctx.reply('Завершить регистрацию и начать новую игру'));
-
-bot.command('oldschool', (ctx) => ctx.reply('Hello')); */
-
-
-/*bot.on('text', (ctx) => {
-    const scores = ctx.db.getScores(ctx.message.from.username);
-    return ctx.reply(`${ctx.message.from.username}: ${scores}`);
-});
-
-
-//if message.chat.type == 'private' and message.text == '/start':
-
-//Передача данных из функции в следующую функцию, ибо если нет условий 
-//и сработает функция, то дальше по коду не пойдёт
-bot.use((ctx, next) => {
-  ctx.state.role = getUserRole(ctx.message)
-  return next()
-})
-
-bot.on('text', (ctx) => {
-  return ctx.reply(`Hello ${ctx.state.role}`)
-})
-
-
-
-
-
-
-//Добавление клавиатуры и кнопки и проверка ответа
-const inlineKeyboard = Markup.inlineKeyboard(
-    [
-        Markup.callbackButton('Yes, text','yes'),
-        Markup.callbackButton('No, text','no')
-    ],
-    {
-        columns: 1
-    }
-);
-bot.command('test', (ctx) => ctx.reply('Hello', inlineKeyboard.extra()));
-bot.action('no', (ctx) => ctx.answerCbQuery('Я записал',false)); 
-//false покажет сверху уведомление и оно само пропадет, нужно 
-//всегда использовать этот метод, что б не крутились часы на кнопке
-
-bot.action('yes', async (ctx) => {
-    await ctx.answerCbQuery('Я записал',false);
-    await ctx.deleteMessage(ctx.callbackQuery.message.message_id);
-});
-*/
-
-/* // Вариант 1: просто вызов асинхронной функции
-doManyThings();
-// Вариант 2: вызов в другой функции с оберткой тру 
-(async function() {
-  try {
-    await doManyThings();
-  } catch (err) {
-    console.error(err);
-  }
-})();
-// Вариант 3: вызов через промис
-doManyThings().then((result) => {
-  // Делаем штуки, которым нужно подождать нашей функции
-}).catch((err) => {
-  throw err;
-}); */
-
-
-

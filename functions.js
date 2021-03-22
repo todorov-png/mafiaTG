@@ -27,7 +27,7 @@ export async function checkBotAdmin(ChatID) {
 export async function checkStartGame(ChatID) {
   let check = false;
   const data = await dq.getDataDeleteMessageRegistration(ChatID);
-  if (data.messageID == 0){
+  if (data == null || data.messageID == 0) {
     check = true;
   } 
   return check;
@@ -77,14 +77,13 @@ export async function checkingLoggedUser(chatID, newChatMembers) {
   const users = await dq.getDataCheckingLoggedUser(chatID);
   if (users != null) {
     for (const userChat of newChatMembers) {
-      console.log(userChat);
       if (userChat.is_bot == false) { 
         let addTtriger = true;
-        users.listOfUser.forEach((user) => {
+        for (const user of users.listOfUser) { 
           if (user.userID == userChat.id) {
             addTtriger = false;
           }
-        });
+        }
         if (addTtriger) {
           await dq.updateDataAddUserInChatBD(chatID, userChat.id, fillingUserName(userChat), userChat.username);
         }

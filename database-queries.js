@@ -138,6 +138,13 @@ export async function updateDataInactivePlay(chatID) {
     );
 }
 
+export async function updateStatusDay(chatID, status) {
+    await mongobd.Chats.updateOne(
+        { chatID: chatID}, 
+        {'dataGame.statysDay': status}
+    );
+}
+
 export async function updateDataGame(chatID, dataGame, players) {
     await mongobd.Chats.updateOne(
         {chatID: chatID}, 
@@ -259,9 +266,37 @@ export async function suspendPlayer(chatID, userID) {
     await mongobd.Chats.updateOne(
         { chatID: chatID }, 
         {
-            'players.$[index].lifeStatus': false
+            'players.$[index].lifeStatus': false,
+            $inc: {'dataGame.counterPlayers': -1}
         },
         { arrayFilters : [{ "index.userID" : userID }] }   
+    );
+}
+
+export async function decrementCounterTriada(chatID) {
+    await mongobd.Chats.updateOne(
+        { chatID: chatID }, 
+        {
+            $inc: {'dataGame.counterTriada': -1}
+        }
+    );
+}
+
+export async function decrementCounterMafia(chatID) {
+    await mongobd.Chats.updateOne(
+        { chatID: chatID }, 
+        {
+            $inc: {'dataGame.counterMafia': -1}
+        }
+    );
+}
+
+export async function decrementCounterWorld(chatID) {
+    await mongobd.Chats.updateOne(
+        { chatID: chatID }, 
+        {
+            $inc: {'dataGame.counterWorld': -1}
+        }
     );
 }
 
