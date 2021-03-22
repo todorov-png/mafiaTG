@@ -223,8 +223,8 @@ async function deleteMessageAct(data, ChatID) {
         if (player.messageID != 0) {
             await app.bot.telegram.deleteMessage(player.userID, player.messageID);
         }
+        await dq.clearMessageIDPlayers(ChatID, player.userID);
     }
-    await dq.clearMessageIDPlayers(ChatID);
 }
 
 //Отправляем сообщение в чат о том что игрок сделал ход
@@ -765,13 +765,13 @@ async function ProcessingResultsDay(ChatID) {
         userNumber;
 
     await deleteMessageAct(data, ChatID); //Удаляем сообщения на которые пользователь не нажимал
-    data.players.forEach((player, i) => {
+    data.players.forEach(async (player, i) => {
         if (player.lifeStatus && player.votesAgainst == maxVoice) {
             counter += 1;
             userNumber = i;
         }
+        await dq.clearVoticeDay(ChatID, player.userID);
     });
-    await dq.clearVoticeDay(ChatID);
     if (counter == 1){
         const message = await app.bot.telegram.sendMessage(
             ChatID, 
@@ -806,7 +806,9 @@ async function ProcessingResultsDay(ChatID) {
                 `Мнения жителей разошлись, этой ночью никого не вешаем...`
             );
         }
-        await dq.clearVoticeDay(ChatID);
+        for (const player of data.players) {
+            await dq.clearVoticeDay(ChatID, player.userID);
+        }
     } else {
         await app.bot.telegram.sendMessage(
             ChatID, 
@@ -842,7 +844,7 @@ function updateCounter(data, i, action) {
         }
     }
     return data;
-}
+} 
 
 //Отправляем гифку сначалом дня
 async function sendSunMessage(ChatID, i) {
@@ -996,7 +998,9 @@ async function sendMessageRegistration(ChatID, time) {
 //Удаление сообщения регистрации
 async function deleteMessageRegistration(chatID) {
     const data = await dq.getDataDeleteMessageRegistration(chatID);
-    app.bot.telegram.deleteMessage(chatID, data.messageID);
+    if (data.messageID != 0){
+        app.bot.telegram.deleteMessage(chatID, data.messageID);
+    }
 }
 
 
@@ -1094,11 +1098,13 @@ export async function callbackQuery(ctx) {
     if (ctx.callbackQuery.data.slice(0, 3) == 'act') {
       await ctx.deleteMessage();
       const messageData = ctx.callbackQuery.data.split(' ');
+      await dq.updateMessageIDPlayer(messageData[1], 0, ctx.callbackQuery.from.id);
       sendMessageAboutProgressRole(messageData[1], ctx.callbackQuery.from.id, messageData[2]);
       await dq.updateCallbackDataPlayer(messageData[1], messageData[2], ctx.callbackQuery.from.id);
     } else if (ctx.callbackQuery.data.slice(0, 2) == 'vs') {
       await ctx.deleteMessage();
       const messageData = ctx.callbackQuery.data.split(' ');
+      await dq.updateMessageIDPlayer(messageData[1], 0, ctx.callbackQuery.from.id);
       sendMessageVoiceUserInChat(messageData[1], ctx.callbackQuery.from.id, messageData[2]);
       await dq.updateCallbackDataVotesAgainstPlayer(messageData[1], messageData[2], 1);
     } else if (ctx.callbackQuery.data.slice(0, 8) == 'copcheck') {
@@ -1153,3 +1159,4 @@ export async function callbackQuery(ctx) {
         );
     }
   }
+

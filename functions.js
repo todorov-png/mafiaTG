@@ -27,7 +27,7 @@ export async function checkBotAdmin(ChatID) {
 export async function checkStartGame(ChatID) {
   let check = false;
   const data = await dq.getDataDeleteMessageRegistration(ChatID);
-  if (data == null || data.messageID == 0) {
+  if (data == null || data.messageID == 0) { 
     check = true;
   } 
   return check;
@@ -172,7 +172,6 @@ function checkUserInBD(array, checkUserId) {
   });
   return checkAddUser;
 }
-
 
 
 

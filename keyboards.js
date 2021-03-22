@@ -45,7 +45,7 @@ export function checkOrKill(ChatID) {
 
 
 
-export function buttonActionsNight(ChatID, players, userID, allies) {
+export function buttonActionsNight(ChatID, players, userID, allies) { 
     let keyboard = [];
     players.forEach((player) => {
         if(player.lifeStatus) {
@@ -65,7 +65,7 @@ export function buttonActionsNight(ChatID, players, userID, allies) {
         }
     });
     return Markup.inlineKeyboard(keyboard, {columns: 1});
-}
+} 
 
 
 export function buttonActionsDay(ChatID, players, userID) {

@@ -222,10 +222,11 @@ export async function updateDataStartGame(chatID) {
     );
 }
 
-export async function clearMessageIDPlayers(chatID) {
+export async function clearMessageIDPlayers(chatID, userID) {
     await mongobd.Chats.updateOne(
         {chatID: chatID}, 
-        { 'players.messageID': 0 }
+        { 'players.$[index].messageID': 0 },
+        { arrayFilters : [{ "index.userID" : userID }] } 
     );
 }
 
@@ -458,14 +459,15 @@ export async function updateCallbackDataVotesPlayer(chatID, userID, whetherVoted
     );
 }
 
-export async function clearVoticeDay(chatID) {
+export async function clearVoticeDay(chatID, userID) {
     await mongobd.Chats.updateOne(
         { chatID: chatID }, 
         {   
-            'players.votesAgainst': 0,
-            'players.votesFor': 0,
-            'players.whetherVoted': false
-        } 
+            'players.$[index].votesAgainst': 0,
+            'players.$[index].votesFor': 0,
+            'players.$[index].whetherVoted': false
+        },
+        { arrayFilters : [{ "index.userID" : userID }] } 
     );
 }
 
