@@ -25,7 +25,6 @@ const UsersSchema = new mongoose.Schema({
     userName: { type: String, required: true },
     gameCounter: { type: Number, required: true, default: 0 },
     victories: { type: Number, required: true, default: 0 },
-
     worldVictories: { type: Number, required: true, default: 0 },
     mafiaVictories: { type: Number, required: true, default: 0 },
     triadaVictories: { type: Number, required: true, default: 0 },
@@ -47,13 +46,14 @@ const ChatsSchema = new mongoose.Schema({
     },
     listOfUser:[UsersSchema],
     dataGame:{
+        counterActiveRoles: { type: Number, required: true, default: 0 },
         counterPlayers: { type: Number, required: true, default: 0 },
         counterTriada: { type: Number, required: true, default: 0 },
         counterMafia: { type: Number, required: true, default: 0 },
         counterWorld: { type: Number, required: true, default: 0 },
         counterDays: { type: Number, required: true, default: 0 },
         statysDay: { type: Boolean, required: true, default: false },
-        timeStart: { type: Date, required: true, default: 0 },
+        timeStart: { type: Number, required: true, default: 0 },
         inactivePlay: { type: Number, required: true, default: 5 }
     },
     players:[

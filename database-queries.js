@@ -16,6 +16,17 @@ export async function getDataRegistrationUserInGame(chatID) {
     );
 }
 
+export async function getDataStatisticsGameInChat(chatID) {
+    return await mongobd.Chats.findOne(
+        { chatID: chatID }, 
+        {
+        title: true, 
+        'statisticsGameInChat': true,
+        _id: false
+        }
+    );
+}
+
 export async function updateDataRegistrationUserInGame(chatID, userID, name, userName) {
     await mongobd.Chats.updateOne(
         {chatID: chatID}, 
@@ -116,6 +127,7 @@ export async function updateDataClearDataGame(chatID) {
         {
         'players': [], 
         'messageID': 0,
+        'dataGame.counterActiveRoles': 0,
         'dataGame.counterPlayers': 0,
         'dataGame.counterTriada': 0, 
         'dataGame.counterMafia': 0, 
@@ -138,10 +150,48 @@ export async function updateDataInactivePlay(chatID) {
     );
 }
 
+export async function updateDataCounterActiveRoles(chatID, triger) {
+    if (triger) {
+        await mongobd.Chats.updateOne(
+            {chatID: chatID}, 
+            {
+                $inc: {'dataGame.counterActiveRoles': 1}
+            }
+        );
+    } else {
+        await mongobd.Chats.updateOne(
+            {chatID: chatID}, 
+            {
+                $inc: {'dataGame.counterActiveRoles': -1}
+            }
+        );
+    }
+}
+
+export async function clearCounterActiveRoles(chatID) {
+    await mongobd.Chats.updateOne(
+        { chatID: chatID }, 
+        { 'dataGame.counterActiveRoles': 0 }
+    );
+}
+
+export async function getDataCounterActiveRoles(chatID) {
+    return await mongobd.Chats.findOne(
+        { chatID: chatID }, 
+        {
+          'dataGame.counterActiveRoles': true, 
+          _id: false
+        }
+    );
+}
+
 export async function updateStatusDay(chatID, status) {
     await mongobd.Chats.updateOne(
         { chatID: chatID}, 
-        {'dataGame.statysDay': status}
+        {
+            'dataGame.statysDay': status,
+            $inc: {'dataGame.counterDays': 1}
+        }
     );
 }
 
@@ -190,6 +240,17 @@ export async function getDataPlayers(chatID) {
     );
 }
 
+export async function getDataUsers(chatID) {
+    return await mongobd.Chats.findOne(
+        { chatID: chatID }, 
+        {
+            title: true,
+            'listOfUser': true, 
+            _id: false
+        }
+    );
+}
+
 export async function getDataGame(chatID) {
     return await mongobd.Chats.findOne(
         { chatID: chatID }, 
@@ -212,12 +273,12 @@ export async function getDataUpdateMessageRegistration(chatID) {
     );
 }
 
-export async function updateDataStartGame(chatID) {
+export async function updateDataStartGame(chatID, time) {
     await mongobd.Chats.updateOne(
         {chatID: chatID}, 
         {
         'dataGame.counterDays': 1,
-        'dataGame.timeStart': Date.now()
+        'dataGame.timeStart': time
         }
     );
 }

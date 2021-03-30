@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import * as functions from './functions.js';
 import * as game from './game.js';
 import Telegraf from 'telegraf';
+import * as keyboards from './keyboards.js';
 import rateLimit from 'telegraf-ratelimit';
 dotenv.config();
 
@@ -79,20 +80,52 @@ bot.command('role', (ctx) => {
 });
 
 //Очищаем данные игры
-bot.command('clear', (ctx) => {
+bot.command('stopgame', (ctx) => {
   game.clearDataGame(ctx.message.chat.id);
 });
-
 
 //Отмечаем всех участников которых знает бот
 bot.command('call', (ctx) => {
   functions.callUsers(ctx);
 });
 
+//Отправляем статистику пользователя
+bot.command('userinfo', (ctx) => {
+  functions.getInfoUser(ctx.message.chat.id, ctx.message.from.id);
+});
+
+//Отправляем статистику чата
+bot.command('chatinfo', (ctx) => {
+  functions.getInfoChat(ctx.message.chat.id);
+});
+
+//Отправляем топ чата
+bot.command('topvictories', (ctx) => {
+  functions.topChat(ctx.message.chat.id, 'победителей', 'victories');
+});
+
+//Отправляем топ чата
+bot.command('topworld', (ctx) => {
+  functions.topChat(ctx.message.chat.id, 'победителей в мирной роли', 'worldVictories');
+});
+
+//Отправляем топ чата
+bot.command('topmafia', (ctx) => {
+  functions.topChat(ctx.message.chat.id, 'победителей в роли мафии', 'mafiaVictories');
+});
+
+//Отправляем топ чата
+bot.command('toptriada', (ctx) => {
+  functions.topChat(ctx.message.chat.id, 'победителей в роли триады', 'triadaVictories');
+});
 
 //При добавлении пользователя запоминаем его данные
 bot.on('new_chat_members', (ctx) => {
-  functions.checkingLoggedUser(ctx.message.chat.id, ctx.message.new_chat_members);
+  if (functions.checkTypeChat(ctx.message.chat.type)) {
+    functions.checkingLoggedUser(ctx.message.chat.id, ctx.message.new_chat_members);
+  } else {
+    functions.leaveChat(ctx.message.chat.id);
+  }
 });
 
 

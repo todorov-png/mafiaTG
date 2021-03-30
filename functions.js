@@ -98,7 +98,11 @@ export async function leftUserOrChat(chatID, leftChatMember) {
   if (leftChatMember.is_bot == false) {
     const users = await dq.getDataleftUserOrChat(chatID);
     if (users != null) {
-      await dq.updateDataLeftUserOrChat(chatID, leftChatMember.id);
+      users.listOfUser.forEach(async (user) => {
+        if (user.userID == leftChatMember.id) {
+          await dq.updateDataLeftUserOrChat(chatID, leftChatMember.id);
+        }
+      });
     }
   } else if(leftChatMember.id == process.env.BOT_ID) {
     await dq.deleteDataLeftUserOrChat(chatID);
@@ -133,6 +137,10 @@ export function checkTypeChat(chatType) {
   }
 }
 
+//Выход бота из чата
+export function leaveChat(chatID) {
+  app.bot.telegram.leaveChat(chatID);
+}
 
 //Делаем запись чата или обновление его данных
 export async function updateOrAddChatInBD(chatID, title) {
@@ -173,5 +181,89 @@ function checkUserInBD(array, checkUserId) {
   return checkAddUser;
 }
 
+//Статистика пользователя
+export async function getInfoUser(chatID, userID) {
+  const data = await dq.getDataUsers(chatID);
+  if (data != null) {
+    data.listOfUser.forEach(async (user) => {
+      if (user.userID === userID) {
+        const textMessage = `${user.name}, ваша статистика в чате ${data.title}:\n`+
+        `- сыграно игр: ${user.gameCounter};\n`+
+        `- побед: ${user.victories};\n`+
+        `- побед мирным жителем: ${user.worldVictories};\n`+
+        `- побед мафией: ${user.mafiaVictories};\n`+
+        `- побед триадой: ${user.triadaVictories};\n`+
+        `- баланс: ${user.money} монет.`;
+        await app.bot.telegram.sendMessage(
+          chatID, 
+          textMessage
+        );
+      }
+    });
+  } else {
+    await app.bot.telegram.sendMessage(
+      chatID, 
+      'Я вас не знаю, поиграйте, потом и поговорим😉'
+    );
+  }
+}
+
+//Статистика чата
+export async function getInfoChat(chatID) {
+  const data = await dq.getDataStatisticsGameInChat(chatID);
+  if (data != null) {
+    const textMessage = `Статистика чата ${data.title}:\n`+
+    `- проведено игр: ${data.statisticsGameInChat.gameCounter};\n`+
+    `- побед мирных жителей: ${data.statisticsGameInChat.peacefulVictories};\n`+
+    `- побед мафий: ${data.statisticsGameInChat.mafiaVictories};\n`+
+    `- побед триады: ${data.statisticsGameInChat.triadaVictories};\n`+
+    `- знаю ${data.statisticsGameInChat.knowUsers} участников в чате;`;
+    await app.bot.telegram.sendMessage(
+      chatID, 
+      textMessage
+    );
+  } else {
+    await app.bot.telegram.sendMessage(
+      chatID, 
+      'Я не знаю ваш чат, поиграйте, потом и поговорим😉'
+    );
+  }
+}
 
 
+//Топ победителей в чате
+export async function topChat(chatID, text, field) {
+  const data = await dq.getDataUsers(chatID);
+  if (data != null) {
+    let users = [],
+        textMessage = `Топ ${text} в чате ${data.title}`;
+
+    data.listOfUser.forEach((user) => {
+      if (user[field] > 0) {
+        users.push(user);
+      }
+    });    
+    users.sort(byField(field));
+    if (users.length > 0) {
+      textMessage += ':';
+      users.forEach(async (user, i) => {
+        textMessage += `\n${i+1}) ${user.name} - ${user[field]};`;
+      }); 
+    } else {
+      textMessage += ` не найден!`;
+    }
+    await app.bot.telegram.sendMessage(
+      chatID, 
+      textMessage.substr(0, 3900)
+    );
+  } else {
+    await app.bot.telegram.sendMessage(
+      chatID, 
+      'Я не знаю ваш чат, поиграйте, потом и поговорим😉'
+    );
+  }
+}
+
+function byField(field) {
+  return (a, b) => a[field] < b[field] ? 1 : -1;
+}
