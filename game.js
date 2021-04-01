@@ -1068,7 +1068,7 @@ async function getLifeUsersText(chatID) {
 }
 
 //Дневное голосование
-async function lastVote(ChatID, result, userID, userIDAct, messageID) {
+async function lastVote(ChatID, result, userID, userIDAct, messageID, callbackQueryID) {
     const user = await dq.getInfoPlayer(ChatID, userID),
           userAct = await dq.getInfoPlayer(ChatID, userIDAct);
 
@@ -1087,6 +1087,7 @@ async function lastVote(ChatID, result, userID, userIDAct, messageID) {
                             userAct.players[0].votesAgainst+1, userAct.players[0].votesFor
                         )
                     );
+                    app.bot.telegram.answerCbQuery(callbackQueryID, 'Вы проголосовали 👍');
                 } else { //Против
                     await dq.updateCallbackDataVotesForPlayer(ChatID, userIDAct, 1);
                     app.bot.telegram.editMessageReplyMarkup(
@@ -1098,6 +1099,7 @@ async function lastVote(ChatID, result, userID, userIDAct, messageID) {
                             userAct.players[0].votesAgainst, userAct.players[0].votesFor+1
                         )
                     );
+                    app.bot.telegram.answerCbQuery(callbackQueryID, 'Вы проголосовали 👎');
                 }
                 await dq.updateCallbackDataVotesPlayer(ChatID, userID, true, result);
         } else if (user.players[0].lifeStatus &&
@@ -1118,6 +1120,7 @@ async function lastVote(ChatID, result, userID, userIDAct, messageID) {
                             userAct.players[0].votesAgainst+1, userAct.players[0].votesFor-1
                         )
                     );
+                    app.bot.telegram.answerCbQuery(callbackQueryID, 'Вы сменили голос на 👍');
                 } else {
                     await dq.updateCallbackDataVotesAgainstPlayer(ChatID, userIDAct, -1);
                     await dq.updateCallbackDataVotesForPlayer(ChatID, userIDAct, 1);
@@ -1130,9 +1133,12 @@ async function lastVote(ChatID, result, userID, userIDAct, messageID) {
                             userAct.players[0].votesAgainst-1, userAct.players[0].votesFor+1
                         )
                     );
+                    app.bot.telegram.answerCbQuery(callbackQueryID, 'Вы сменили голос на 👎');
                 }
             }
         }
+    } else {
+        app.bot.telegram.answerCbQuery(callbackQueryID, 'Вы не можете голосовать!');
     }
 }
 
@@ -1194,7 +1200,8 @@ export async function callbackQuery(ctx) {
         true,                              //Голос за
         ctx.callbackQuery.from.id,         //Айди того кто нажал на кнопку
         ctx.callbackQuery.data.slice(3),   //Айди того кому нужно добавить голос
-        ctx.callbackQuery.message.message_id//Айди сообщения которое нужно изменить
+        ctx.callbackQuery.message.message_id,//Айди сообщения которое нужно изменить
+        ctx.callbackQuery.id
         );
     } else if (ctx.callbackQuery.data.slice(0, 2) == 'no') {
       await lastVote(
@@ -1202,7 +1209,8 @@ export async function callbackQuery(ctx) {
         false,                              //Голос за
         ctx.callbackQuery.from.id,         //Айди того кто нажал на кнопку
         ctx.callbackQuery.data.slice(2),   //Айди того кому нужно добавить голос
-        ctx.callbackQuery.message.message_id//Айди сообщения которое нужно изменить
+        ctx.callbackQuery.message.message_id,//Айди сообщения которое нужно изменить
+        ctx.callbackQuery.id
         );
     }
   }

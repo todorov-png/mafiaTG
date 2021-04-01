@@ -155,8 +155,6 @@ bot.on('new_chat_title', (ctx) => {
 //Ловим колбеки от кнопок
 bot.on('callback_query', (ctx) => {
   game.callbackQuery(ctx);
-  //console.log('колбек', ctx.callbackQuery.id);
-  //bot.answerCbQuery(ctx.callbackQuery.id, 'Сработало!');
 });
 
 
