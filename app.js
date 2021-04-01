@@ -3,11 +3,10 @@ import dotenv from 'dotenv';
 import * as functions from './functions.js';
 import * as game from './game.js';
 import Telegraf from 'telegraf';
-import * as keyboards from './keyboards.js';
 import rateLimit from 'telegraf-ratelimit';
 dotenv.config();
 
- 
+
 // Set limit to 75 message per 3 seconds
 const limitConfig = {
   window: 3000,
@@ -17,12 +16,13 @@ const limitConfig = {
 
 //Создаем обьект бота
 export const bot = new Telegraf(process.env.TELEGRAM_TOKEN);
-//bot.use(rateLimit(limitConfig));
-bot.use(Telegraf.log()); //Выводит сообщение в консоль
+bot.use(rateLimit(limitConfig));
+//bot.use(Telegraf.log()); //Выводит сообщение в консоль
 
 //Обработка ошибок
 bot.catch((err, ctx) => {
-    console.log(`Ой, произошла ошибка для ${ctx.updateType}`, err);
+  console.log(`Ой, произошла ошибка для ${ctx.updateType}`, err);
+  bot.telegram.sendMessage(process.env.CREATOR_ID, `Ой, произошла ошибка для ${ctx.updateType} ошибка: ${err}`);
 });
 
 //Приветствуем пользователя и записываем его на игру, если с командой пришел id чата
@@ -46,14 +46,19 @@ bot.help((ctx) => {
 
 
 //Запускаем игру
-bot.command('game', (ctx) => {
+bot.command('game', async (ctx) => {
   //Если пришло с группового чата, то запускаем регистрацию участников
   if (functions.checkTypeChat(ctx.message.chat.type)) {
     //Проверяем дали ли боту права админа
-    if (functions.checkBotAdmin(ctx.message.chat.id) &&
-        functions.checkStartGame(ctx.message.chat.id)) {
-          functions.updateOrAddChatInBD(ctx.message.chat.id, ctx.message.chat.title);
+    if (await functions.checkBotAdmin(ctx.message.chat.id)) {
+      if (await functions.checkStartGame(ctx.message.chat.id)) {
+          await functions.updateOrAddChatInBD(ctx.message.chat.id, ctx.message.chat.title);
           game.launch(ctx.message.chat.id);
+      } else {
+        ctx.reply('Игра уже запущена, не мешайте!');
+      }
+    } else {
+      ctx.reply('Сделайте бота администратором и дайте разрешение на удаление сообщений!');
     }
   } else {
     ctx.reply('Эту команду необходимо отправлять в групповом чате!');
@@ -148,16 +153,15 @@ bot.on('new_chat_title', (ctx) => {
 
 
 //Ловим колбеки от кнопок
-bot.on('callback_query', async (ctx) => {
-  console.log('callbake ');
-  console.log(ctx.callbackQuery);
+bot.on('callback_query', (ctx) => {
   game.callbackQuery(ctx);
-  
+  //console.log('колбек', ctx.callbackQuery.id);
+  //bot.answerCbQuery(ctx.callbackQuery.id, 'Сработало!');
 });
 
 
 //Удаляем сообщение, если ночь или убит
-bot.on('text', (ctx) => {
+bot.on('message', (ctx) => {
   if (functions.checkTypeChat(ctx.message.chat.type)) {
     game.closeWriteChat(ctx);
   }

@@ -9,9 +9,9 @@ import  mongoose  from  'mongoose';
 
 //Подключаемся к БД
 mongoose.connect(process.env.URL_BD_CONNECT, {
-    useUnifiedTopology: true, 
-    useNewUrlParser: true, 
-    useFindAndModify : false , 
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+    useFindAndModify : false ,
     useCreateIndex: true
   })
     .then(() => console.log('Подключение к бд произошло успешно'))

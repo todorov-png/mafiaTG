@@ -15,44 +15,38 @@ export async function checkBotAdmin(ChatID) {
       status = true;
     }
   });
-  if (status == false) {
-    await app.bot.telegram.sendMessage(
-      ChatID, 
-      'Сделайте бота администратором и дайте разрешение на удаление сообщений!'
-    );
-  }
   return status;
 }
 
 export async function checkStartGame(ChatID) {
   let check = false;
   const data = await dq.getDataDeleteMessageRegistration(ChatID);
-  if (data == null || data.messageID == 0) { 
+  if (data == null || data.messageID === 0) {
     check = true;
-  } 
+  }
   return check;
 }
 
 //Записываем пользователя на игру и сохраняем его в чате
 export async function registrationUserInGame(ctx, chatID) {
   const users = await dq.getDataRegistrationUserInGame(chatID);
-  console.log(users);
+
   if (users == null) {
     ctx.reply('Чат игры не найден, попробуйте еще', Extra.inReplyTo(ctx.message.message_id));
   } else {
-    if (checkUserInBD(users.listOfUser, ctx.message.from.id)) {
+    if (await checkUserInBD(users.listOfUser, ctx.message.from.id)) {
       await dq.updateDataAddUserInChatBD(
-        chatID, 
-        ctx.message.from.id, 
-        fillingUserName(ctx.message.from), 
+        chatID,
+        ctx.message.from.id,
+        fillingUserName(ctx.message.from),
         ctx.message.from.username
       );
-    }    
+    }
     if (users.dataGame.counterDays == 0) {
       if (users.players.length > 24) {
         ctx.reply('Вы опоздали на регистрацию, я уже набрал максимальное количество участников!');
       } else {
-        if (checkUserInBD(users.players, ctx.message.from.id)) {
+        if (await checkUserInBD(users.players, ctx.message.from.id)) {
           await dq.updateDataRegistrationUserInGame(
             chatID, 
             ctx.message.from.id, 
@@ -195,14 +189,14 @@ export async function getInfoUser(chatID, userID) {
         `- побед триадой: ${user.triadaVictories};\n`+
         `- баланс: ${user.money} монет.`;
         await app.bot.telegram.sendMessage(
-          chatID, 
+          chatID,
           textMessage
         );
       }
     });
   } else {
     await app.bot.telegram.sendMessage(
-      chatID, 
+      chatID,
       'Я вас не знаю, поиграйте, потом и поговорим😉'
     );
   }
@@ -219,12 +213,12 @@ export async function getInfoChat(chatID) {
     `- побед триады: ${data.statisticsGameInChat.triadaVictories};\n`+
     `- знаю ${data.statisticsGameInChat.knowUsers} участников в чате;`;
     await app.bot.telegram.sendMessage(
-      chatID, 
+      chatID,
       textMessage
     );
   } else {
     await app.bot.telegram.sendMessage(
-      chatID, 
+      chatID,
       'Я не знаю ваш чат, поиграйте, потом и поговорим😉'
     );
   }
@@ -242,23 +236,23 @@ export async function topChat(chatID, text, field) {
       if (user[field] > 0) {
         users.push(user);
       }
-    });    
+    });
     users.sort(byField(field));
     if (users.length > 0) {
       textMessage += ':';
       users.forEach(async (user, i) => {
         textMessage += `\n${i+1}) ${user.name} - ${user[field]};`;
-      }); 
+      });
     } else {
       textMessage += ` не найден!`;
     }
     await app.bot.telegram.sendMessage(
-      chatID, 
+      chatID,
       textMessage.substr(0, 3900)
     );
   } else {
     await app.bot.telegram.sendMessage(
-      chatID, 
+      chatID,
       'Я не знаю ваш чат, поиграйте, потом и поговорим😉'
     );
   }
