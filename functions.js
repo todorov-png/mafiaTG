@@ -246,7 +246,7 @@ export async function topChat(chatID, text, field) {
     users.sort(byField(field));
     if (users.length > 0) {
       textMessage += ':';
-      users.forEach(async (user, i) => {
+      users.forEach((user, i) => {
         textMessage += `\n${i+1}) ${user.name} - ${user[field]};`;
       });
     } else {
