@@ -230,6 +230,15 @@ export async function updateDataAddUserInChatBD(chatID, userID, nameUser, userNa
     );
 }
 
+export async function updateNameUser(chatID, userID, nameUser, userName) {
+    await mongobd.Chats.updateOne(
+        {chatID: chatID},
+        { 'listOfUser.$[index].name': nameUser,
+          'listOfUser.$[index].userName': userName},
+        { arrayFilters : [{ "index.userID" : userID }] }
+    );
+}
+
 export async function getDataPlayers(chatID) {
     return await mongobd.Chats.findOne(
         { chatID: chatID },

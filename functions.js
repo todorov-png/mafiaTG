@@ -41,6 +41,12 @@ export async function registrationUserInGame(ctx, chatID) {
         fillingUserName(ctx.message.from),
         ctx.message.from.username
       );
+    } else {
+      await dq.updateNameUser(
+        chatID,
+        ctx.message.from.id,
+        fillingUserName(ctx.message.from),
+        ctx.message.from.username);
     }
     if (users.dataGame.counterDays == 0) {
       if (users.players.length > 24) {
@@ -48,9 +54,9 @@ export async function registrationUserInGame(ctx, chatID) {
       } else {
         if (await checkUserInBD(users.players, ctx.message.from.id)) {
           await dq.updateDataRegistrationUserInGame(
-            chatID, 
-            ctx.message.from.id, 
-            fillingUserName(ctx.message.from), 
+            chatID,
+            ctx.message.from.id,
+            fillingUserName(ctx.message.from),
             ctx.message.from.username
           );
           ctx.reply('Ты присоединился к игре в '+users.title, Extra.inReplyTo(ctx.message.message_id));

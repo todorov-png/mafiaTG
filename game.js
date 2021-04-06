@@ -233,11 +233,11 @@ async function sendMessageVote(ChatID, players) {
     for (const player of players) {
         if (player.lifeStatus && player.votes) {
             const messageData = await app.bot.telegram.sendMessage(
-                player.userID, 
+                player.userID,
                 'Пришло время искать виноватых!\nКого ты хочешь линчевать?',
-                { 
-                    parse_mode: 'HTML', 
-                    reply_markup: keyboards.buttonActionsDay(ChatID, players, player.userID) 
+                {
+                    parse_mode: 'HTML',
+                    reply_markup: keyboards.buttonActionsDay(ChatID, players, player.userID)
                 }
             );
             await dq.updateMessageIDPlayer(ChatID, messageData.message_id, player.userID);
@@ -467,50 +467,8 @@ async function sendNightMessageLivePlayers(ChatID) {
 //Отправляем сообщения с ролями игроков
 async function sendRoleMessage(ChatID) {
     const data = await dq.getDataGame(ChatID);
-    let textMessage;
     for (let player of data.players) {
-        textMessage = 'error';
-        switch(player.role) {
-            case 'Мирный житель':
-                textMessage = 'Ты - 👨🏼 <b>Мирный житель</b>.\nТвоя задача вычислить Мафию с Триадой и на городском собрании линчевать засранцев';
-                break;
-            case 'Дон':
-                textMessage = 'Ты - 🤵🏻 <b>Дон (глава мафии)!</b>.\nТебе решать кто не проснётся этой ночью...';
-                break;
-            case 'Крёстный отец':
-                textMessage = 'Ты - 🤵🏼 <b>Крёстный отец</b>.\nТебе решать кто лишится права голоса следующим днём...\nОднажды ты сможешь стать Доном.';
-                break;
-            case 'Доктор':
-                textMessage = 'Ты - 👨🏼‍⚕️ <b>Доктор</b>.\nТебе решать кого спасти этой ночью...';
-                break;
-            case 'Комиссар':
-                textMessage = 'Ты - 🕵🏼️‍♂️ <b>Комиссар</b>.\nГлавный городской защитник и гроза мафии...';
-                break;
-            case 'Лейтенант':
-                textMessage = 'Ты - 👮🏻 <b>Лейтенант</b>.\nТвоя задача помогать Комиссару вычислить Мафию и Триаду. Однажы ты сможешь стать Комиссаром';
-                break;
-            case 'Счастливчик':
-                textMessage = 'Ты - 🤞 <b>Счастливчик</b>.\nТвоя задача вычислить мафию и на городском собрании линчевать засранцев. Если повезёт, при покушении ты останешься жив.';
-                break;
-            case 'Камикадзе':
-                textMessage = 'Ты - 🤦🏼‍♂️ <b>Камикадзе</b>.\nТвоя цель - умереть на городском собрании! :)';
-                break;
-            case 'Телохранитель':
-                textMessage = 'Ты - 👥 <b>Телохранитель</b>.\nТебе решать кого спасать от пули...';
-                break;
-            case 'Мститель':
-                textMessage = 'Ты - 🔪 <b>Мститель</b>.\nТебе решать кто этой ночью умрёт...';
-                break;
-            case 'Красотка':
-                textMessage = 'Ты - 💃🏻 <b>Красотка</b>.\nТебе решать кто этой ночью забудет о своей работе и будет с тобой...';
-                break;
-            case 'Триада':
-                textMessage = 'Ты - 👳🏻‍♂️ <b>Триада</b>.\nТебе решать кто этой ночью лишится жизни...';
-                break;
-            case 'Сенсей':
-                textMessage = 'Ты - 🧘🏻 <b>Сенсей</b>.\nТебе решать кого проверить на притчастность к Мафии или Комиссару...';
-                break;
-        }
+        const textMessage = await createTextMessageRoles(player.role);
         await app.bot.telegram.sendMessage(
             player.userID,
             textMessage,
@@ -519,41 +477,94 @@ async function sendRoleMessage(ChatID) {
     }
 }
 
+//Формируем текст сообщения с описанием роли
+function createTextMessageRoles(role) {
+    let textMessage = 'error';
+    switch(role) {
+        case 'Мирный житель':
+            textMessage = 'Ты - 👨🏼 <b>Мирный житель</b>.\nТвоя задача вычислить Мафию с Триадой и на городском собрании линчевать засранцев';
+            break;
+        case 'Дон':
+            textMessage = 'Ты - 🤵🏻 <b>Дон (глава мафии)!</b>.\nТебе решать кто не проснётся этой ночью...';
+            break;
+        case 'Крёстный отец':
+            textMessage = 'Ты - 🤵🏼 <b>Крёстный отец</b>.\nТебе решать кто лишится права голоса следующим днём...\nОднажды ты сможешь стать Доном.';
+            break;
+        case 'Доктор':
+            textMessage = 'Ты - 👨🏼‍⚕️ <b>Доктор</b>.\nТебе решать кого спасти этой ночью...';
+            break;
+        case 'Комиссар':
+            textMessage = 'Ты - 🕵🏼️‍♂️ <b>Комиссар</b>.\nГлавный городской защитник и гроза мафии...';
+            break;
+        case 'Лейтенант':
+            textMessage = 'Ты - 👮🏻 <b>Лейтенант</b>.\nТвоя задача помогать Комиссару вычислить Мафию и Триаду. Однажы ты сможешь стать Комиссаром';
+            break;
+        case 'Счастливчик':
+            textMessage = 'Ты - 🤞 <b>Счастливчик</b>.\nТвоя задача вычислить мафию и на городском собрании линчевать засранцев. Если повезёт, при покушении ты останешься жив.';
+            break;
+        case 'Камикадзе':
+            textMessage = 'Ты - 🤦🏼‍♂️ <b>Камикадзе</b>.\nТвоя цель - умереть на городском собрании! :)';
+            break;
+        case 'Телохранитель':
+            textMessage = 'Ты - 👥 <b>Телохранитель</b>.\nТебе решать кого спасать от пули...';
+            break;
+        case 'Мститель':
+            textMessage = 'Ты - 🔪 <b>Мститель</b>.\nТебе решать кто этой ночью умрёт...';
+            break;
+        case 'Красотка':
+            textMessage = 'Ты - 💃🏻 <b>Красотка</b>.\nТебе решать кто этой ночью забудет о своей работе и будет с тобой...';
+            break;
+        case 'Триада':
+            textMessage = 'Ты - 👳🏻‍♂️ <b>Триада</b>.\nТебе решать кто этой ночью лишится жизни...';
+            break;
+        case 'Сенсей':
+            textMessage = 'Ты - 🧘🏻 <b>Сенсей</b>.\nТебе решать кого проверить на притчастность к Мафии или Комиссару...';
+            break;
+    }
+    return textMessage;
+}
+
+//Формируем текст сообщения с действием
+async function createTextMessageAction(role, userID, ChatID) {
+    let textMessage = '';
+    switch(role) {
+        case 'Дон':
+        case 'Мститель':
+        case 'Триада':
+            textMessage = 'Кого будем убивать этой ночью?';
+            break;
+        case 'Крёстный отец':
+            textMessage = 'Кого будем лишать права голоса днем?';
+            break;
+        case 'Доктор':
+            textMessage = 'Кого будем лечить?';
+            break;
+        case 'Комиссар':
+            const messageData = await app.bot.telegram.sendMessage(
+                userID,
+                'Что будем делать?',
+                { reply_markup: keyboards.checkOrKill(ChatID) }
+            );
+            await dq.updateMessageIDPlayer(ChatID, messageData.message_id, userID);
+            break;
+        case 'Телохранитель':
+            textMessage = 'Кого будем защищать этой ночью?';
+            break;
+        case 'Красотка':
+            textMessage = 'Кого будем радовать этой ночью?';
+            break;
+        case 'Сенсей':
+            textMessage = 'Кого будем проверять?';
+            break;
+    }
+    return textMessage;
+}
+
 //Отправляем сообщение с действиями для активных ролей
 async function sendNightMessageActionsLivePlayers(ChatID, data) {
-    data.players.forEach( async (player) => {
+    for (let player of data.players) {
         if (player.lifeStatus) {
-            let textMessage = '';
-            switch(player.role) {
-                case 'Дон':
-                case 'Мститель':
-                case 'Триада':
-                    textMessage = 'Кого будем убивать этой ночью?';
-                    break;
-                case 'Крёстный отец':
-                    textMessage = 'Кого будем лишать права голоса днем?';
-                    break;
-                case 'Доктор':
-                    textMessage = 'Кого будем лечить?';
-                    break;
-                case 'Комиссар':
-                    const messageData = await app.bot.telegram.sendMessage(
-                        player.userID,
-                        'Что будем делать?',
-                        { reply_markup: keyboards.checkOrKill(ChatID) }
-                    );
-                    await dq.updateMessageIDPlayer(ChatID, messageData.message_id, player.userID);
-                    break;
-                case 'Телохранитель':
-                    textMessage = 'Кого будем защищать этой ночью?';
-                    break;
-                case 'Красотка':
-                    textMessage = 'Кого будем радовать этой ночью?';
-                    break;
-                case 'Сенсей':
-                    textMessage = 'Кого будем проверять?';
-                    break;
-            }
+            let textMessage = await createTextMessageAction(player.role, player.userID, ChatID);
             if (textMessage != '') {
                 await dq.updateDataCounterActiveRoles(ChatID, true);
                 const messageData = await app.bot.telegram.sendMessage(
@@ -564,7 +575,7 @@ async function sendNightMessageActionsLivePlayers(ChatID, data) {
                 await dq.updateMessageIDPlayer(ChatID, messageData.message_id, player.userID);
             }
         }
-    });
+    }
 }
 
 //Обрабатываем результаты ночи
@@ -818,10 +829,10 @@ async function ProcessingResultsDay(ChatID) {
     });
     if (counter == 1){
         const message = await app.bot.telegram.sendMessage(
-            ChatID, 
+            ChatID,
             `Вы действительно хотите линчевать <a href="tg://user?id=${data.players[userNumber].userID}">${data.players[userNumber].name}</a>?`,
             {
-              parse_mode: 'HTML', 
+              parse_mode: 'HTML',
               reply_markup: keyboards.voteYesNoDay(data.players[userNumber].userID, 0, 0)
             }
         );
@@ -1033,7 +1044,7 @@ async function sendMessageRegistration(ChatID, time) {
     }
     const messageRegistration = await app.bot.telegram.sendMessage(
         ChatID,
-        `Игра начнётся через ${time} секунд! \nСписок участников:`+ await getLifeUsersText(ChatID), 
+        `Игра начнётся через ${time} секунд! \nСписок участников:`+ await getLifeUsersText(ChatID),
         {
             parse_mode: 'HTML',
             reply_markup: keyboards.userRegistrationBtn(process.env.URL_BOT, ChatID)
@@ -1136,6 +1147,8 @@ async function lastVote(ChatID, result, userID, userIDAct, messageID, callbackQu
                     app.bot.telegram.answerCbQuery(callbackQueryID, 'Вы сменили голос на 👎');
                 }
             }
+        } else {
+            app.bot.telegram.answerCbQuery(callbackQueryID, 'Вы не можете голосовать!');
         }
     } else {
         app.bot.telegram.answerCbQuery(callbackQueryID, 'Вы не можете голосовать!');

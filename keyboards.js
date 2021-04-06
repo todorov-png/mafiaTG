@@ -42,11 +42,7 @@ export function checkOrKill(ChatID) {
     ], {columns: 2});
 }
 
-
-
-
-
-export function buttonActionsNight(ChatID, players, userID, allies) { 
+export function buttonActionsNight(ChatID, players, userID, allies) {
     let keyboard = [];
     players.forEach((player) => {
         if(player.lifeStatus) {
@@ -58,22 +54,21 @@ export function buttonActionsNight(ChatID, players, userID, allies) {
                 keyboard.push(Markup.callbackButton('☑️ '+player.name, `act ${ChatID} ${player.userID}`));
             } else {
                 if (allies!=0 && player.allies==allies) {
-                    keyboard.push(Markup.callbackButton('☑️ '+player.name, `act ${ChatID} ${player.userID}`)); 
+                    keyboard.push(Markup.callbackButton('☑️ '+player.name, `act ${ChatID} ${player.userID}`));
                 } else {
-                    keyboard.push(Markup.callbackButton(player.name, `act ${ChatID} ${player.userID}`)); 
+                    keyboard.push(Markup.callbackButton(player.name, `act ${ChatID} ${player.userID}`));
                 }
             }
         }
     });
     return Markup.inlineKeyboard(keyboard, {columns: 1});
-} 
-
+}
 
 export function buttonActionsDay(ChatID, players, userID) {
     let keyboard = [];
     players.forEach((player) => {
         if(player.lifeStatus && player.userID != userID) {
-            keyboard.push(Markup.callbackButton(player.name, `vs ${ChatID} ${player.userID}`)); 
+            keyboard.push(Markup.callbackButton(player.name, `vs ${ChatID} ${player.userID}`));
         }
     });
     return Markup.inlineKeyboard(keyboard, {columns: 1});
