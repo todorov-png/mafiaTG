@@ -14,6 +14,18 @@ const limitConfig = {
   onLimitExceeded: (ctx, next) => ctx.reply('Ограничение скорости превышено')
 };
 
+
+
+/*const API_TOKEN = process.env.TELEGRAM_TOKEN || '';
+const PORT = process.env.PORT || 3000;
+const URL_ADDRESS = process.env.URL || 'https://mafiabotjs.com';
+
+export const bot = new Telegraf(API_TOKEN);
+bot.telegram.setWebhook(`${URL_ADDRESS}/${process.env.SECRET}`);
+//bot.telegram.setWebhook(`${URL}/bot${API_TOKEN}`);
+//bot.startWebhook(`/${process.env.SECRET}`, null, PORT);
+*/
+
 //Создаем обьект бота
 export const bot = new Telegraf(process.env.TELEGRAM_TOKEN);
 bot.use(rateLimit(limitConfig));
@@ -168,3 +180,4 @@ bot.on('message', (ctx) => {
 
 //Запускаем бесконечный цикл полинга
 bot.launch();
+//bot.startWebhook(`/${process.env.SECRET}`, null, PORT);

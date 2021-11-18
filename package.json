@@ -4,7 +4,11 @@
   "description": "Бот игры мафия для telegram",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "add": "git add .",
+    "commit": "git commit -m 'fix'",
+    "push": "git push heroku master",
+    "deploy": "git add . && git commit -m 'fix' && git push heroku master"
   },
   "author": "Евгений Тодоров",
   "license": "ISC",

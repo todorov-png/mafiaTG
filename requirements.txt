@@ -1,0 +1,6 @@
+"dotenv": "^8.2.0",
+"mongodb": "^3.6.4",
+"mongoose": "^5.11.15",
+"telegraf": "^3.38.0",
+"telegraf-ratelimit": "^2.0.0",
+"tsd": "^0.14.0"
